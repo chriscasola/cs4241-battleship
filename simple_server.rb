@@ -12,6 +12,10 @@ get '/' do
   redirect 'http://' + request.host_with_port() + '/index.html'
 end
 
+get '/db_path' do
+  DATABASE_URL
+end
+
 get '*' do
   "Path: " + request.fullpath()
 end
