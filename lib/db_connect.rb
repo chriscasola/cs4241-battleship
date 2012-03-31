@@ -14,10 +14,15 @@ def connectToDB(dbPath)
   
   #conn = PG::Connection.new('localhost', nil, nil, nil, 'battledb', 'Chris', '3445')
   
+  queryStr2 = <<EOS
+    INSERT INTO test_table VALUES (3, 'Name');
+    INSERT INTO test_table VALUES (4, 'someone');
+EOS
+  
   queryStr3 = <<EOS
     SELECT userid, username FROM test_table;
 EOS
-  
+  conn.exec(queryStr2)
   results = conn.exec(queryStr3)
   
   strOut = queryStr3 + '<br />'
