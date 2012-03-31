@@ -15,12 +15,12 @@ def connectToDB(dbPath)
   #conn = PG::Connection.new('localhost', nil, nil, nil, 'battledb', 'Chris', '3445')
   
   queryStr3 = <<EOS
-    SELECT * FROM test_table;
+    SELECT userid, username FROM test_table;
 EOS
   
   results = conn.exec(queryStr3)
   
-  strOut = ''
+  strOut = queryStr3 + '<br />'
   results.each do |row|
     row.each do |column|
       strOut = strOut + ' ' + column.to_s
