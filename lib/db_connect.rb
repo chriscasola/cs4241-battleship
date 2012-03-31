@@ -19,5 +19,12 @@ def connectToDB(dbPath)
 EOS
   
   results = conn.exec(queryStr3)
-  'success'
+  
+  strOut = ''
+  results.each do |row|
+    row.each do |column|
+      strOut = strOut + ' ' + column.to_s
+    end
+  end
+  return strOut
 end
