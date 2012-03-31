@@ -2,9 +2,15 @@
 # This is a simple Web server, mainly for serving static content with some JavaScript in order
 # to get started building a Web site.
 #
-# gpollice
+# Chris Casola
+# Chris Page
 ##
+
+# Add the lib directory to the search path
+$: << File.expand_path(File.dirname(__FILE__) + "/lib")
+
 require 'sinatra'
+require 'db_connect'
 
 set :public_folder, File.dirname(__FILE__) + '/public'
 
@@ -13,7 +19,7 @@ get '/' do
 end
 
 get '/db_path' do
-  SHARED_DATABASE_URL
+  connectToDB(DATABASE_URL)
 end
 
 get '*' do
