@@ -4,8 +4,7 @@
 
 require 'pg'
 
-function connectToDB(dbPath) {
-  conn = PG.connect( dbname: dbPath )
+def connectToDB(dbPath)
   
 =begin
   conn.exec( "SELECT * FROM pg_stat_activity" ) do |result|
@@ -16,4 +15,3 @@ function connectToDB(dbPath) {
   end
 =end
 end
-}
