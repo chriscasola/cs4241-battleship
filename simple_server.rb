@@ -19,7 +19,6 @@ get '/' do
 end
 
 get '/db_path' do
-  ENV['SHARED_DATABASE_URL']
   connectToDB(ENV['SHARED_DATABASE_URL'])
 end
 
