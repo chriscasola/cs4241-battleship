@@ -12,19 +12,16 @@ def connectToDB(dbPath)
     (
       userid integer,
       username varchar(20)
-    )
+    );
 EOS
 
   queryStr2 = <<EOS
-    INSERT INTO test_table
-    VALUES (1, 'bob')
-    
-    INSERT INTO test_table
-    VALUES (2, 'chris')
+    INSERT INTO test_table VALUES (1, 'bob');
+    INSERT INTO test_table VALUES (2, 'chris');
 EOS
   
   queryStr3 = <<EOS
-    SELECT * FROM test_table
+    SELECT * FROM test_table;
 EOS
   
   conn.exec(queryStr1)
