@@ -20,7 +20,7 @@ end
 
 get '/db_path' do
   ENV['SHARED_DATABASE_URL']
-  #connectToDB(DATABASE_URL)
+  connectToDB(ENV['SHARED_DATABASE_URL'])
 end
 
 get '*' do
