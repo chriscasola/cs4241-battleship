@@ -13,7 +13,7 @@ get '/' do
 end
 
 get '/db_path' do
-  DATABASE_URL
+  SHARED_DATABASE_URL
 end
 
 get '*' do
