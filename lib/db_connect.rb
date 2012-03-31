@@ -1,6 +1,6 @@
-/*
- * File to connect to postgre sql database
- */
+#
+# File to connect to postgre sql database
+#
 
 require 'pg'
 
