@@ -19,7 +19,8 @@ get '/' do
 end
 
 get '/db_path' do
-  connectToDB(DATABASE_URL)
+  SHARED_DATABASE_URL
+  #connectToDB(DATABASE_URL)
 end
 
 get '*' do

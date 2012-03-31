@@ -18,6 +18,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  pg (= 0.13.2)
+  pg
   sinatra (= 1.1.0)
   thin (= 1.2.7)
