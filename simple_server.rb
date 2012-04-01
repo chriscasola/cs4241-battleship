@@ -10,7 +10,7 @@
 $: << File.expand_path(File.dirname(__FILE__) + "/lib")
 
 require 'sinatra'
-require 'db_connect'
+require 'dbmgr'
 
 set :public_folder, File.dirname(__FILE__) + '/public'
 
@@ -18,8 +18,12 @@ get '/' do
   redirect 'http://' + request.host_with_port() + '/index.html'
 end
 
-get '/db_path' do
-  connectToDB(ENV['SHARED_DATABASE_URL'])
+get '/db_manager' do
+  runDBShell(ENV['SHARED_DATABASE_URL'])
+end
+
+post '/db_manager' do
+  runDBShell(ENV['SHARED_DATABASE_URL'], params)
 end
 
 get '*' do
