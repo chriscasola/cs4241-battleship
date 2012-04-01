@@ -18,6 +18,13 @@ get '/' do
   redirect 'http://' + request.host_with_port() + '/index.html'
 end
 
+get '/test' do
+  if (request.env['rack.url_scheme'] == 'http')
+    redirect 'https://' + request.host_with_port() + '/test'
+  end
+  'success!'
+end
+
 get '/db_manager' do
   runDBShell(ENV['SHARED_DATABASE_URL'])
 end
