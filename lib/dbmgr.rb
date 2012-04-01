@@ -21,7 +21,7 @@ def runDBShell (dbPath, params=nil)
     <body>
       <h1>Enter SQL statements in the box below.</h1>
       <form method="post">
-      <textarea name="sqlCode" rows="20" cols="50"></textarea><br /><br />
+      <textarea name="sqlCode" rows="20" cols="150"></textarea><br /><br />
       <input type="submit" value="Submit">
       </form>
     </body>
