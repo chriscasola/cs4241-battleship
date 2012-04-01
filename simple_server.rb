@@ -19,7 +19,7 @@ get '/' do
 end
 
 get '/test' do
-  if (request.env['rack.url_scheme'] == 'http')
+  unless (request.env['HTTP_X_FORWARDED_PROTO'] || request.env['rack.url_scheme'])=='https'
     redirect 'https://' + request.host_with_port() + '/test'
   end
   'success!'
