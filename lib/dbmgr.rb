@@ -5,8 +5,8 @@
 require 'pg'
 
 def connectToDB(dbPath)
-  dbPath =~ /^postgres:\/\/(\S*):(\S*)@(\S*)\/(\S*)$/
-  conn = PG::Connection.new($3, nil, nil, nil, $1, $4, $2)
+  dbPath =~ %r|^postgres://(\S*):(\S*)@(\S*)/(\S*)$|
+  conn = PG::Connection.new( :host => $3, :dbname => $1, :user => $4, :password => $2)
 end
 
 def runDBShell (dbPath, params=nil)
