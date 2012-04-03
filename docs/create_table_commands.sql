@@ -34,7 +34,7 @@ CREATE TABLE users_icons (
  * a battle opponent.
  */
 CREATE TABLE users_waiting_for_battle (
-	userid integer REFERENCES users(userid),
+	userid integer PRIMARY KEY REFERENCES users(userid),
 	startedWaiting timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
