@@ -1,23 +1,48 @@
 
+/**
+ * The users table keeps track of information important for login and 
+ * management of a user account.
+ */
 CREATE TABLE users (
 	userid integer PRIMARY KEY,
 	name varchar NOT NULL UNIQUE,
 	email varchar,
 	password varchar NOT NULL,
-	icon integer DEFAULT 0,
-	wins integer DEFAULT 0
 );
 
-CREATE TABLE online_users (
+/**
+ * The users_online table is for keeping track of users who are currently 
+ * logged in.
+ */
+CREATE TABLE users_online (
 	sessionid varchar PRIMARY KEY,
 	userid integer REFERENCES users(userid),
 	timein timestamp DEFAULT CURRENT_TIMESTAMP,
-	laston timestamp DEFAULT CURRENT_TIMESTAMP,
-	available boolean DEFAULT false
+	laston timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+/**
+ * The users_icons table keeps track of what icon each user has.
+ */
+CREATE TABLE users_icons (
+	userid integer PRIMARY KEY REFERENCES users(userid),
+	icon integer DEFAULT 0
+);
+
+/**
+ * The users_waiting_for_battle table keeps track of users who are waiting for 
+ * a battle opponent.
+ */
+CREATE TABLE users_waiting_for_battle (
+	userid integer REFERENCES users(userid),
+	startedWaiting timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TYPE battlestatus AS ENUM ('p1turn', 'p2turn', 'p1win', 'p2win', 'tie', 'endofworld');
 
+/**
+ * Use a special SELECT statement to find the number of wins and losses a user has.
+ */
 CREATE TABLE battles (
 	battleid integer PRIMARY KEY,
 	p1id integer NOT NULL REFERENCES users(userid),
@@ -30,18 +55,20 @@ CREATE TABLE battles (
 
 CREATE TYPE shiptype AS ENUM ('carrier', 'battleship', 'submarine', 'cruiser', 'destroyer');
 
-CREATE TABLE ships (
+CREATE TYPE orientation AS ENUM ('horizontal', 'vertical');
+
+CREATE TABLE battle_positions (
 	battleid integer REFERENCES battles(battleid) ON DELETE CASCADE,
 	playerid integer REFERENCES users(userid),
 	xpos integer,
 	ypos integer,
-	type shiptype NOT NULL,
-	orientation boolean NOT NULL, /* true=horizontal, false=vertical */
+	stype shiptype NOT NULL,
+	orientation orientation NOT NULL,
 	afloat boolean DEFAULT true,
 	CONSTRAINT pk_ships PRIMARY KEY (battleid, playerid, xpos, ypos)
 );
 
-CREATE TABLE moves (
+CREATE TABLE battle_moves (
 	battleid integer REFERENCES battles(battleid) ON DELETE CASCADE,
 	playerid integer REFERENCES users(userid),
 	xpos integer,
