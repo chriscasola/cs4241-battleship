@@ -14,7 +14,7 @@ CREATE TABLE users (
 	userid integer PRIMARY KEY,
 	name varchar NOT NULL UNIQUE,
 	email varchar NOT NULL UNIQUE,
-	password varchar NOT NULL,
+	password varchar NOT NULL
 );
 
 /**
