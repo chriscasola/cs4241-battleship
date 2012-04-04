@@ -1,0 +1,15 @@
+/*
+ * Style sheet for canvas elements
+ */
+
+#opponentBoard {
+	width: 100px;
+	height: 100px;
+	background-color: white;
+}
+
+#myBoard {
+	width: 100px;
+	height: 100px;
+	background-color: white;
+}
