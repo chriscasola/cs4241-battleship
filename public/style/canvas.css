@@ -2,14 +2,9 @@
  * Style sheet for canvas elements
  */
 
-#opponentBoard {
-	width: 100px;
-	height: 100px;
-	background-color: white;
+#opponentBoard, #myBoard {
+	/*background-color: rgb(173,173,173);*/
+	background-color: gray;
+	margin: 0 2.5em 0 2.5em;
 }
 
-#myBoard {
-	width: 100px;
-	height: 100px;
-	background-color: white;
-}
