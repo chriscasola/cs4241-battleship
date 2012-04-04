@@ -1,0 +1,118 @@
+/*
+ * Main style sheet for Battle Ship
+ * 
+ * Author: Chris Casola, Chris Page
+ */
+
+/* Font for the Header */
+@font-face {
+  font-family: 'Londrina Sketch';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Londrina Sketch'), local('LondrinaSketch-Regular'), url('http://themes.googleusercontent.com/static/fonts/londrinasketch/v1/p7Ai06aT1Ycp_D2fyE3z6z0WCr4BXWfANofoahM5yqc.woff') format('woff');
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	/*background-color: rgb(196,218,210);*/
+	background-color: rgb(22,41,67);
+}
+
+
+/*
+ * Code for Header
+ */
+header {
+	font-family: 'Helvetica', 'Arial', 'Sans Serif';
+	font-size: 1.25em;
+	font-weight: 200;
+	margin: 0;
+	padding: 0;
+}
+
+header ul {
+	margin: 0;
+	padding: 0;
+}
+
+header h1 {
+	font-family: 'Londrina Sketch';
+	font-size: 4em;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
+	text-align: center;
+	display: block;
+	color: rgb(173,173,173);
+}
+
+/*
+ * Code for Navigation
+ */
+
+nav {
+	height: 35px;
+	margin: 5px 5px 0 5px;
+	padding: 0 0 0 0;
+	background: linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -o-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -moz-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -webkit-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -ms-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	border-radius: 5px;
+}
+
+nav li {
+	display: inline;
+	padding-left: .6em;
+	padding-right: .6em;
+	margin: 0 0 0 0;
+	height: 35px;
+	float: left;
+	color: black;
+	padding-top: 0em;
+}
+
+nav li:hover {	
+	background: linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -o-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -moz-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -webkit-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -ms-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	border-radius: 5px;
+}
+
+nav li p {
+	margin: 6px 0 0 0;
+	font-size: .9em;
+}
+
+nav li a:link, nav li a:visited {
+	color: black;
+	text-decoration: none;
+}
+
+.activePage {
+	background: linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -o-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -moz-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -webkit-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -ms-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	
+	border-radius: 5px;
+}
+
+.rightSide {
+	float: right;
+}
+
+
+/*
+ * Main Content
+ */
+#mainContent {
+	margin-top: 3em;
+	text-align: center;
+	color: rgb(173,173,173);
+	font-family: 'Arial', 'Sans Serif';
+}
