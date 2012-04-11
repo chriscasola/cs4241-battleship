@@ -72,7 +72,8 @@ end
 # @return [String] The hashed password.
 def hashPassword(password)
   sha256 = Digest::SHA256.new
-  return sha256.digest password
+  hashedPwd = sha256.hexdigest(password)
+  return hashedPwd
 end
 
 # Generates a unique session id.
@@ -84,7 +85,8 @@ def generateUniqueSessionId(userId)
   toHash = Time.now.to_s + userId.to_s
   
   sha256 = Digest::SHA256.new
-  return sha256.digest toHash
+  hashedUSId = sha256.digest(toHash)
+  return hashedUSId
 end
 
 # Attempts to log in a user with the given information.
@@ -104,14 +106,14 @@ def login(email, password)
     File.open('battle.log', 'w') {|f| f.write(query) }
     #ic = Iconv.new('UNICODE//IGNORE', 'UTF-8')
     #query = ic.iconv(query)
-    results = conn.exec(query).result() # TODO: fix encoding error issues!!!
+    results = conn.exec(query)
     
     # If the credentials are wrong (0 results)
-    if (results.length == 0)
+    if (results.ntuples == 0)
       JSON_Error.gsub(/%%error%%/, "Email or password not found.");
       
     # If there are too many results (this should never occur)
-    elsif (results.length > 1)
+    elsif (results.ntuples > 1)
       JSON_Error.gsub(/%%error%%/, "Database is corrupt.");
       
     # If the credentials are valid
