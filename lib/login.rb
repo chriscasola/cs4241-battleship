@@ -101,6 +101,7 @@ def login(email, password)
     # TODO Escape the email.
     
     query = SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password))
+    File.open('battle.log', 'w') {|f| f.write(query) }
     #ic = Iconv.new('UNICODE//IGNORE', 'UTF-8')
     #query = ic.iconv(query)
     results = conn.exec(query).result() # TODO: fix encoding error issues!!!

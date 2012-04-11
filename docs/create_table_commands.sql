@@ -11,7 +11,7 @@
  *				salting system as well.
  */
 CREATE TABLE users (
-	userid integer PRIMARY KEY,
+	userid SERIAL PRIMARY KEY,
 	name varchar NOT NULL UNIQUE,
 	email varchar NOT NULL UNIQUE,
 	password varchar NOT NULL
