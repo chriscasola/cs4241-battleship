@@ -1,85 +1,84 @@
+/*
+ * This file provides the functions that initialize
+ * the game boards
+ */
+
+var Columns = new Array();
+var Rows = new Array();
+var opponentCanvas;
+var myCanvas;
 
 function initCanvas () {
-
-	var opponentView = document.getElementById('opponentBoard').getContext("2d");
-	var myView = document.getElementById('myBoard').getContext("2d");
+	// Find the canvas elements
+	opponentCanvas = document.getElementById('opponentBoard');
+	myCanvas = document.getElementById('myBoard');
 	
-	var height = opponentView.canvas.height;
-	var width = myView.canvas.width;
+	// Draw grids on both canvases
+	initGrid(myCanvas, "#000000", 10);
+	initGrid(opponentCanvas, "#000000", 10);
 	
-	drawGrid(opponentView, "#000000", 1, 10, 10, width, height);
-	drawGrid(myView, "#000000", 1, 10, 10, width, height);
+	// Add event listener for click events on the canvas
+	myCanvas.addEventListener("mouseup", canvasClick, false);
 	
-	document.getElementById('opponentBoard').addEventListener("mouseup", makeMove, false);
-	document.getElementById('myBoard').addEventListener("mouseup", makeMove, false);
+	// Set battle information
+	localStorage['battleid'] = "asdf";
+	localStorage['playerid'] = "chris";
 }
 
-function makeMove(event) {
-	var x;
-	var y;
-	canvas = event.target;
+/*
+ * Draws a grid on the given canvas in the given color
+ * and with the specified size number of rows and columns.
+ */
+function initGrid(canvas, color, size) {
+	// calculate where the grid lines should be placed
+	computeLineLocations(size, canvas.width, Columns);
+	computeLineLocations(size, canvas.height, Rows);
 	
-	if (event.x != undefined && event.y != undefined) {
-		x = event.x;
-		y = event.y;
-	}
-	else { /* code for firefox */
-		x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-		y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-	}
-	
-	x -= canvas.offsetLeft;
-	y -= canvas.offsetTop;
-	
-	var shotCell = pixelsToCell(x, y, 350 / 10, 350 / 10);
-	var shotPos = cellToPixels(shotCell.col, shotCell.row, 350 / 10, 350 / 10);
-	
-	drawShot(canvas.getContext("2d"), 'red', shotPos.x, shotPos.y);
-	
-	//alert("x: " + x + " y: " + y);
+	// draw the lines on the canvas
+	drawLines(canvas, Columns, color, "vertical");
+	drawLines(canvas, Rows, color, "horizontal");
 }
 
-function drawShot(context, color, xPos, yPos) {	
-	context.fillStyle = color;
-	context.beginPath();
-	context.arc(xPos, yPos, 10, 0, 2 * Math.PI);
-	context.closePath();
-	context.fill();
-	context.stroke();
-}
-
-function drawGrid(context, color, width, numCols, numRows, cWidth, cHeight) {	
+/*
+ * Draws the given list of lines on the given canvas with
+ * the given orientation and color.  The list should be a
+ * list of type Line.
+ */
+function drawLines(canvas, lineList, color, orientation) {
+	var context = canvas.getContext("2d");
 	context.strokeStyle = color;
-	context.lineWidth = width;
+	context.lineWidth = 2;
 	
-	var currXPos;
-	for (currXPos = 0.5; currXPos <= cWidth; currXPos += Math.floor((cWidth / numCols))) {
+	var i;
+	for (i = 0; i < lineList.length; i++) {
 		context.beginPath();
-		context.moveTo(currXPos, 0);
-		context.lineTo(currXPos, 350);
+		if (orientation == "vertical") {
+			context.moveTo(lineList[i].position, 0);
+			context.lineTo(lineList[i].position, canvas.height);
+		}
+		else {
+			context.moveTo(0, lineList[i].position);
+			context.lineTo(canvas.width, lineList[i].position);
+		}
 		context.stroke();
 	}
+}
+
+/*
+ * Determines where each line should be placed given
+ * the number of lines and the width of the canvas.  It stores the
+ * horizontal position of each of these lines in the Choices array.
+ */
+function computeLineLocations(numLines, canvasDim, lineList) {
+	lineList.push(new Line(0));
+
+	var dx = canvasDim / numLines;
+	var currPos = 0;
 	
-	var currYPos;	
-	for (currYPos = 0.5; currYPos <= cHeight; currYPos += Math.floor((cHeight / numRows))) {
-		context.beginPath();
-		context.moveTo(0, currYPos);
-		context.lineTo(350, currYPos);
-		context.stroke();
+	while (numLines > 0) {
+		currPos += dx;
+		lineList.push(new Line(currPos));
+		numLines--;
 	}
+	lineList.push(new Line(canvasDim));
 }
-
-function cellToPixels(col, row, width, height) {
-	var pixels = {x: 0, y: 0};
-	pixels.x = (width * col) - Math.floor((width / 2));
-	pixels.y = (height * row) - Math.floor((height / 2));
-	return pixels;
-}
-
-function pixelsToCell(xPos, yPos, width, height) {
-	var cell = {col: 0, row: 0};
-	cell.col = Math.floor((xPos / width) + .5);
-	cell.row = Math.floor((yPos / height) + .5);
-	return cell;
-}
-

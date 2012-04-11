@@ -3,8 +3,7 @@
  */
 
 #opponentBoard, #myBoard {
-	/*background-color: rgb(173,173,173);*/
-	background-color: gray;
+	background-color: rgb(173,173,173);
 	margin: 0 2.5em 0 2.5em;
 }
 

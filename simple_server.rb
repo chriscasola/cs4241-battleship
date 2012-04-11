@@ -12,6 +12,8 @@ $: << File.expand_path(File.dirname(__FILE__) + "/lib")
 require 'sinatra'
 require 'dbmgr'
 require 'login'
+require 'game_play'
+require 'json'
 
 set :public_folder, File.dirname(__FILE__) + '/public'
 
@@ -33,6 +35,10 @@ end
 # TODO: change this to post
 get '/api/login' do
   login(params[:email], params[:password])
+end
+
+post '/api/shot' do
+  receive_shot(request.body.read)
 end
 
 get '/db_manager' do
