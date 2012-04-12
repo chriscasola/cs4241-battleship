@@ -3,12 +3,14 @@
  * the user's interaction with the game boards
  */
 
+var last_shot_received = 0;
+
 function canvasClick(event) {
 	// get location where the user clicked
 	var clickPos = getClickPosition(event, event.target);
 	
 	// construct a Shot representing this click
-	var thisShot = new Shot(localStorage['battleid'], localStorage['playerid'], clickPos.x, clickPos.y, false);
+	var thisShot = new Shot(localStorage['battleid'], localStorage['playerid'], clickPos.x, clickPos.y, false, 0);
 	thisShot.mouseToCell();
 	
 	// send the shot to the server and draw the shot upon response

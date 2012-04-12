@@ -21,8 +21,8 @@ function initCanvas () {
 	myCanvas.addEventListener("mouseup", canvasClick, false);
 	
 	// Set battle information
-	localStorage['battleid'] = "asdf";
-	localStorage['playerid'] = "chris";
+	localStorage['battleid'] = "1";
+	localStorage['playerid'] = "1";
 }
 
 /*

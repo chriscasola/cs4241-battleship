@@ -41,6 +41,10 @@ post '/api/shot' do
   receive_shot(request.body.read)
 end
 
+get '/api/shot' do
+  send_shot
+end
+
 get '/db_manager' do
   runDBShell(ENV['SHARED_DATABASE_URL'])
 end

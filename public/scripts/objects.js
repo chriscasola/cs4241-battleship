@@ -22,12 +22,13 @@ function Line (position) {
  * ypos - the ypos of the Shot
  * hit - true if a hit, false if miss
  */
-function Shot (battleid, playerid, xpos, ypos, hit) {
+function Shot (battleid, playerid, xpos, ypos, hit, id) {
 	this.battleid = battleid;
 	this.playerid = playerid;
 	this.xpos = xpos;
 	this.ypos = ypos;
 	this.hit = hit;
+	this.id = id;
 }
 
 /*
@@ -96,7 +97,12 @@ Shot.prototype.send = function () {
 }
 
 function receiveShot(response) {
-	var shot_obj = eval('(' + response + ')');
-	var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit);
-	the_shot.draw(document.getElementById('myBoard'));
+	if (response == 'invalid') {
+		alert('Invalid shot');
+	}
+	else {
+		var shot_obj = eval('(' + response + ')');
+		var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit, shot_obj.id);
+		the_shot.draw(document.getElementById('myBoard'));
+	}
 }

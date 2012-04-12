@@ -64,7 +64,7 @@ CREATE TYPE battlestatus AS ENUM ('p1turn', 'p2turn', 'p1win', 'p2win', 'tie', '
  * Use a special SELECT statement to find the number of wins and losses a user has.
  */
 CREATE TABLE battles (
-	battleid integer PRIMARY KEY,
+	battleid SERIAL PRIMARY KEY,
 	p1id integer NOT NULL REFERENCES users(userid),
 	p2id integer NOT NULL REFERENCES users(userid),
 	size integer DEFAULT 2 CHECK (size>0 AND size<4),
@@ -111,6 +111,7 @@ CREATE TABLE battle_positions (
  * Keeps track of a user's moves in a particular battle.
  */
 CREATE TABLE battle_moves (
+	moveid SERIAL UNIQUE,
 	battleid integer REFERENCES battles(battleid) ON DELETE CASCADE,
 	playerid integer REFERENCES users(userid),
 	xpos integer,
