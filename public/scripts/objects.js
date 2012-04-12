@@ -62,11 +62,8 @@ Shot.prototype.draw = function (canvas) {
 	var hitY;
 	var context = canvas.getContext("2d");
 	
-	if (this.xpos == undefined) {
-		alert ('undefined xpos for ' + this.id);
-	}
-	if (this.ypos == undefined) {
-		alert ('undefined ypos for ' + this.id);
+	if ((this.xpos == undefined) || (this.ypos == undefined) || (Columns[this.xpos].position == undefined) || (Columns[this.xpos + 1].position == undefined) || (Rows[this.ypos].position == undefined) || (Rows[this.ypos + 1].position == undefined)) {
+		alert ('undefined for ' + this.id);
 	}
 	
 	hitX = (Columns[this.xpos].position + Columns[this.xpos + 1].position) / 2;
