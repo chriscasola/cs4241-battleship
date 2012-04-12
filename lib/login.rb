@@ -36,7 +36,7 @@ def validateEmail(email)
   end
   
   # TODO Until this function is correctly implemented, it causes a horrendous security vulnerability.
-  return true # TODO This is wrong. Finished this function.
+  return true # TODO This is wrong. Finish this function.
 end
 
 # Checks whether or not the password is valid.
@@ -139,8 +139,6 @@ def login(email, password)
         
         JSON.generate(JSON_Output)
       end
-      
-      #JSON_LoginSuccessful.gsub(/%%name%%/, name);
     end
     
   # If the email or password is invalid.
@@ -149,4 +147,6 @@ def login(email, password)
     JSON_Output['error'] = "Email or password is invalid."
     JSON.generate(JSON_Output)
   end
+  
+  # TODO add library for checking if user is logged in
 end
