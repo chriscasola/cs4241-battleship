@@ -8,6 +8,7 @@
 require 'digest/sha2'
 require 'dbmgr'
 require 'iconv'
+require 'json'
 
 SQL_SelectUserIdViaCredentials = 
 <<EOS
@@ -19,24 +20,10 @@ EOS
 SQL_InsertNewOnlineRecord = 
 <<EOS
 INSERT INTO users_online (sessionid, userid)
-VALUES (%%sessionid%%, %%userid%%);
+VALUES ('%%sessionid%%', %%userid%%);
 EOS
 
-JSON_Error = 
-<<EOS
-{"login": {
-  "loggedin": "false",
-  "error": "%%error%%"
-}}
-EOS
-
-JSON_LoginSuccessful = 
-<<EOS
-{"login": {
-  "loggedin": "true",
-  "name": "%%name%%"
-}}
-EOS
+JSON_Output = {'success' => false, 'name' => '', 'userid' => -1, 'sessionid' => -1, 'error' => ''}
 
 # Checks whether or not the given email is an actual email address.
 #
@@ -85,7 +72,7 @@ def generateUniqueSessionId(userId)
   toHash = Time.now.to_s + userId.to_s
   
   sha256 = Digest::SHA256.new
-  hashedUSId = sha256.digest(toHash)
+  hashedUSId = sha256.hexdigest(toHash)
   return hashedUSId
 end
 
@@ -110,11 +97,17 @@ def login(email, password)
     
     # If the credentials are wrong (0 results)
     if (results.ntuples == 0)
-      JSON_Error.gsub(/%%error%%/, "Email or password not found.");
+      JSON_Output['success'] = false
+      JSON_Output['error'] = "Email or password not found."
+      conn.finish()
+      JSON.generate(JSON_Output)
       
     # If there are too many results (this should never occur)
     elsif (results.ntuples > 1)
-      JSON_Error.gsub(/%%error%%/, "Database is corrupt.");
+      JSON_Output['success'] = false
+      JSON_Output['error'] = "Database is corrupt."
+      conn.finish()
+      JSON.generate(JSON_Output)
       
     # If the credentials are valid
     else
@@ -122,15 +115,38 @@ def login(email, password)
       name = results[0]['name']
       results.clear()
       sessionid = generateUniqueSessionId(userid)
-      results = conn.exec(SQL_InsertNewOnlineRecord.gsub(/%%sessionid%%/, sessionid).gsub(/%%userid%%/, userid))
       
-      # TODO Make sure that the insert worked.
+      query = SQL_InsertNewOnlineRecord.gsub(/%%sessionid%%/, sessionid).gsub(/%%userid%%/, userid)
+      File.open('battle.log', 'w') {|f| f.write(query) }
+      results = conn.exec(query)
       
-      JSON_LoginSuccessful.gsub(/%%name%%/, name);
+      if (results.cmd_tuples() == 1)
+        # generate session cookie
+        session["sessionid"] = sessionid
+        
+        # return JSON
+        JSON_Output['success'] = true
+        JSON_Output['name'] = name
+        JSON_Output['userid'] = userid
+        JSON_Output['sessionid'] = sessionid
+        conn.finish()
+        
+        JSON.generate(JSON_Output)
+      else
+        JSON_Output['success'] = false
+        JSON_Output['error'] = "Session not inserted."
+        conn.finish()
+        
+        JSON.generate(JSON_Output)
+      end
+      
+      #JSON_LoginSuccessful.gsub(/%%name%%/, name);
     end
     
   # If the email or password is invalid.
   else
-    JSON_Error.gsub(/%%error%%/, "Email or password are invalid.");
+    JSON_Output['success'] = false
+    JSON_Output['error'] = "Email or password is invalid."
+    JSON.generate(JSON_Output)
   end
 end
