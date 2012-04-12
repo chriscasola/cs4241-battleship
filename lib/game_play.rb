@@ -16,20 +16,24 @@ def receive_shot(json_req)
     the_shot["hit"] = false
   end
   
-  #store the shot in db
-  conn = connectToDB(ENV['SHARED_DATABASE_URL'])
-  query = SQL_InsertBattleMove.gsub(/%%battleid%%/, the_shot["battleid"])
-  query = query.gsub(/%%playerid%%/, the_shot["playerid"])
-  query = query.gsub(/%%xpos%%/, the_shot["xpos"].to_s)
-  query = query.gsub(/%%ypos%%/, the_shot["ypos"].to_s)
-  query = query.gsub(/%%hit%%/, the_shot["hit"].to_s)
-  begin
-    conn.exec(query)
-  rescue
+  if (verify_shot(the_shot) == false)
     return 'invalid'
-    conn.finish()
   end
-  conn.finish()
+  
+  begin  
+    #store the shot in db
+    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+    query = SQL_InsertBattleMove.gsub(/%%battleid%%/, the_shot["battleid"])
+    query = query.gsub(/%%playerid%%/, the_shot["playerid"])
+    query = query.gsub(/%%xpos%%/, the_shot["xpos"].to_s)
+    query = query.gsub(/%%ypos%%/, the_shot["ypos"].to_s)
+    query = query.gsub(/%%hit%%/, the_shot["hit"].to_s)
+    conn.exec(query)
+    conn.finish()
+  rescue
+    conn.finish()
+    return 'invalid'
+  end
   return the_shot.to_json
 end
 
@@ -60,4 +64,11 @@ EOS
     conn.finish()
     return response
   end
+end
+
+def verify_shot(the_shot)
+  if ((the_shot["xpos"] > 9) || (the_shot["xpos"] < 0) || (the_shot["ypos"] > 9) || (the_shot["ypos"] < 0))
+    return false
+  end
+  return true
 end
