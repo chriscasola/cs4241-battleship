@@ -8,6 +8,15 @@ INSERT INTO battle_moves(battleid, playerid, xpos, ypos, hit)
 VALUES (%%battleid%%, %%playerid%%, %%xpos%%, %%ypos%%, %%hit%%);
 EOS
 
+def receive_ship(json_req)
+  the_ship = JSON.parse(json_req)
+  
+  # TODO validate the ship, then store in database
+  # need to check that position is valid for given ship size, etc.
+  
+  the_ship.to_json
+end
+
 def receive_shot(json_req)
   the_shot = JSON.parse(json_req)
   if (rand(100) < 30)

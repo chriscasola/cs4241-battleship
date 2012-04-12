@@ -5,6 +5,142 @@
  */
 
 /*
+ * An object that represents a Ship
+ */
+function Ship (battleid, playerid, xpos, ypos, shiptype, orientation, afloat) {
+	this.battleid = battleid;
+	this.playerid = playerid;
+	this.xpos = xpos;
+	this.ypos = ypos;
+	this.shiptype = shiptype;
+	this.orientation = orientation;
+	this.afloat = afloat;
+}
+
+Ship.prototype.draw = function (canvas) {
+	var context = canvas.getContext("2d");
+	var width = 0;
+	var height = 0;
+	var cellDimension = 35;
+	var canvas_x;
+	var canvas_y;
+	
+	switch (this.shiptype) {
+		case 'carrier':
+			if (this.orientation == 'vertical') {
+				width = 15;
+				height = 5 * cellDimension;
+			}
+			else {
+				width = 5 * cellDimension;
+				height = 15;
+			}
+			break;
+		case 'battleship':
+			if (this.orientation == 'vertical') {
+				width = 15;
+				height = 4 * cellDimension;
+			}
+			else {
+				width = 4 * cellDimension;
+				height = 15;
+			}
+			break;
+		case 'submarine':
+			if (this.orientation == 'vertical') {
+				width = 15;
+				height = 3 * cellDimension;
+			}
+			else {
+				width = 3 * cellDimension;
+				height = 15;
+			}
+			break;
+		case 'cruiser':
+			if (this.orientation == 'vertical') {
+				width = 15;
+				height = 3 * cellDimension;
+			}
+			else {
+				width = 3 * cellDimension;
+				height = 15;
+			}
+			break;
+		case 'destroyer':
+			if (this.orientation == 'vertical') {
+				width = 15;
+				height = 2 * cellDimension;
+			}
+			else {
+				width = 2 * cellDimension;
+				height = 15;
+			}
+			break;
+	}
+	
+	canvas_x = (Columns[this.xpos].position + Columns[this.xpos + 1].position) / 2;
+	canvas_y = (Rows[this.ypos].position + Rows[this.ypos + 1].position) / 2;
+	
+	canvas_x -= (this.orientation == 'vertical') ? width / 2 : cellDimension / 2;
+	canvas_y -= (this.orientation == 'vertical') ? cellDimension / 2 : height / 2;
+	
+	context.beginPath();
+    context.rect(canvas_x, canvas_y, width, height);
+    context.fillStyle = '#8ED6FF';
+    context.fill();
+    context.lineWidth = 1;
+    context.strokeStyle = 'none';
+    context.stroke();
+}
+
+/*
+ * Function to convert a Ships's position fields
+ * from mouse coordinates into cell coordinates
+ */
+Ship.prototype.mouseToCell = function () {
+	// convert xpos to column
+	var i;
+	for (i = 0; i < Columns.length - 1; i++) {
+		if ((this.xpos > Columns[i].position) && (this.xpos < Columns[i+1].position)) {
+			this.xpos = i;
+			break;
+		}
+	}
+	
+	// convert ypos to row
+	for (i = 0; i < Rows.length - 1; i++) {
+		if ((this.ypos > Rows[i].position) && (this.ypos < Rows[i+1].position)) {
+			this.ypos = i;
+			break;
+		}
+	}
+}
+
+/*
+ * Function to send a Shot to the server
+ */
+Ship.prototype.send = function () {
+	$.ajax({
+	  type: 'POST',
+	  url: '/api/ship',
+	  data: JSON.stringify(this),
+	  success: receiveShip,
+	  dataType: 'text'
+	});
+}
+
+function receiveShip(response) {
+	if (response == 'invalid') {
+		alert('Invalid ship');
+	}
+	else {
+		var ship_obj = eval('(' + response + ')');
+		var the_ship = new Ship(ship_obj.battleid, ship_obj.playerid, ship_obj.xpos, ship_obj.ypos, ship_obj.shiptype, ship_obj.orientation, ship_obj.afloat);
+		the_ship.draw(leftCanvas);
+	}
+}
+
+/*
  * An object that represents a Line on a Canvas
  */
 function Line (position) {
@@ -62,10 +198,6 @@ Shot.prototype.draw = function (canvas) {
 	var hitY;
 	var context = canvas.getContext("2d");
 	
-	if ((this.xpos == undefined) || (this.ypos == undefined) || (Columns[this.xpos] == undefined) || (Columns[this.xpos + 1] == undefined) || (Rows[this.ypos] == undefined) || (Rows[this.ypos + 1] == undefined)) {
-		alert ('undefined for ' + this.id);
-	}
-	
 	hitX = (Columns[this.xpos].position + Columns[this.xpos + 1].position) / 2;
 	hitY = (Rows[this.ypos].position + Rows[this.ypos + 1].position) / 2;
 	
@@ -107,6 +239,6 @@ function receiveShot(response) {
 	else {
 		var shot_obj = eval('(' + response + ')');
 		var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit, shot_obj.id);
-		the_shot.draw(document.getElementById('myBoard'));
+		the_shot.draw(rightCanvas);
 	}
 }

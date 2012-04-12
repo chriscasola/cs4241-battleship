@@ -116,3 +116,22 @@ nav li a:link, nav li a:visited {
 	color: rgb(173,173,173);
 	font-family: 'Arial', 'Sans Serif';
 }
+
+#orientationSelection {
+	margin-top: 25px;
+	margin-bottom: 10px;
+}
+
+#shipSelection input {
+	margin-right: 5px;
+}
+
+#shipSelection p {
+	display: inline;
+	margin-right: 10px;
+}
+
+#orientationSelection p {
+	display: inline;
+	margin-right: 10px;
+}

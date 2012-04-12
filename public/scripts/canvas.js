@@ -5,26 +5,28 @@
 
 var Columns = new Array();
 var Rows = new Array();
-var opponentCanvas;
-var myCanvas;
+var leftCanvas;
+var rightCanvas;
 
 window.onload = function () {
 	// Find the canvas elements
-	opponentCanvas = document.getElementById('opponentBoard');
-	myCanvas = document.getElementById('myBoard');
+	leftCanvas = document.getElementById('opponentBoard');
+	rightCanvas = document.getElementById('myBoard');
 	
 	// Draw grids on both canvases
-	initGrid(myCanvas, "#000000", 10);
-	initGrid(opponentCanvas, "#000000", 10);
+	initGrid(rightCanvas, "#000000", 10);
+	initGrid(leftCanvas, "#000000", 10);
 	
 	// Add event listener for click events on the canvas
-	myCanvas.addEventListener("mouseup", canvasClick, false);
+	rightCanvas.addEventListener("mouseup", canvasClick, false);
 	
 	// Set battle information
 	localStorage['battleid'] = "1";
 	
 	// Listen for moves from server
 	listenForMoves();
+	
+	leftCanvas.addEventListener("mouseup", placeShip, false);
 }
 
 /*

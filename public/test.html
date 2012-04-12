@@ -7,7 +7,7 @@
                 padding: 0px;
             }
             
-            #myCanvas {
+            #rightCanvas {
                 border: 1px solid #9C9898;
             }
         </style>
@@ -41,7 +41,7 @@
             }
             
             window.onload = function(){
-                var canvas = document.getElementById('myCanvas');
+                var canvas = document.getElementById('rightCanvas');
                 var context = canvas.getContext('2d');
                 
                 canvas.addEventListener('mousemove', function(evt){
@@ -53,7 +53,7 @@
         </script>
     </head>
     <body onmousedown="return false;">
-        <canvas id="myCanvas" width="500" height="500">
+        <canvas id="rightCanvas" width="500" height="500">
         </canvas>
     </body>
 </html>
