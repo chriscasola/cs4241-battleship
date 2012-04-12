@@ -48,7 +48,7 @@ CREATE TABLE users_icons (
 /**
  * Keeps track of users who are waiting for a battle opponent.
  */
-CREATE TABLE users_waiting_for_battle (
+CREATE TABLE users_waiting (
 	userid integer PRIMARY KEY REFERENCES users(userid),
 	startedWaiting timestamp DEFAULT CURRENT_TIMESTAMP
 );
