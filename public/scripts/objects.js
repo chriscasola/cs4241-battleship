@@ -62,7 +62,7 @@ Shot.prototype.draw = function (canvas) {
 	var hitY;
 	var context = canvas.getContext("2d");
 	
-	if ((this.xpos == undefined) || (this.ypos == undefined) || (Columns[this.xpos].position == undefined) || (Columns[this.xpos + 1].position == undefined) || (Rows[this.ypos].position == undefined) || (Rows[this.ypos + 1].position == undefined)) {
+	if ((this.xpos == undefined) || (this.ypos == undefined) || (Columns[this.xpos] == undefined) || (Columns[this.xpos + 1] == undefined) || (Rows[this.ypos] == undefined) || (Rows[this.ypos + 1] == undefined)) {
 		alert ('undefined for ' + this.id);
 	}
 	
