@@ -17,6 +17,37 @@ function canvasClick(event) {
 	thisShot.send();
 }
 
+function listenForMoves() {
+	$.ajax({
+	  type: 'POST',
+	  url: '/api/check_shot',
+	  data: last_shot_received.toString(),
+	  success: receiveOtherShot,
+	  dataType: 'text'
+	});
+}
+
+function receiveOtherShot(response) {
+	if (response != 'none') {
+		shot_list = eval('(' + response + ')');
+		
+		var i;
+		for (i = 0; i < shot_list.length; i++) {
+			var shot_obj = shot_list[i];
+			var the_shot = new Shot(parseInt(shot_obj.battleid), parseInt(shot_obj.playerid), parseInt(shot_obj.xpos), parseInt(shot_obj.ypos), shot_obj.hit, parseInt(shot_obj.id));
+			the_shot.hit = (the_shot.hit == 't') ? true : false;
+			if (the_shot.playerid == localStorage['playerid']) {
+				the_shot.draw(document.getElementById('myBoard'));
+			}
+			else {
+				the_shot.draw(document.getElementById('opponentBoard'));
+			}
+			last_shot_received = the_shot.id;
+		}
+	}
+	setTimeout(listenForMoves, 5000);
+}
+
 /*
  * This functions gets the position of the mouse click
  */

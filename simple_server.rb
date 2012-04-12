@@ -32,8 +32,7 @@ get '/test' do
   'success!'
 end
 
-# TODO: change this to post
-get '/api/login' do
+post '/api/login' do
   login(params[:email], params[:password])
 end
 
@@ -41,8 +40,8 @@ post '/api/shot' do
   receive_shot(request.body.read)
 end
 
-get '/api/shot' do
-  send_shot
+post '/api/check_shot' do
+  send_shots(request.body.read)
 end
 
 get '/db_manager' do

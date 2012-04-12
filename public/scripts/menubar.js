@@ -9,7 +9,7 @@ var sectionNames = [
 ];
 
 var extraButtons = [
-	{title: "Login", href: "/index.html"},
+	{title: "Login", href: "/login.html"},
 	{title: "Register", href: "/index.html"},
 ];
 

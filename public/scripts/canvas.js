@@ -8,7 +8,7 @@ var Rows = new Array();
 var opponentCanvas;
 var myCanvas;
 
-function initCanvas () {
+window.onload = function () {
 	// Find the canvas elements
 	opponentCanvas = document.getElementById('opponentBoard');
 	myCanvas = document.getElementById('myBoard');
@@ -22,7 +22,9 @@ function initCanvas () {
 	
 	// Set battle information
 	localStorage['battleid'] = "1";
-	localStorage['playerid'] = "1";
+	
+	// Listen for moves from server
+	listenForMoves();
 }
 
 /*
