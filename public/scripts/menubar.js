@@ -6,6 +6,7 @@ var sectionNames = [
 	{title: "Home", href: "/index.html"},
 	{title: "About", href: "/about.html"},
 	{title: "Leaderboard", href: "/leaderboard.html"},
+	{title: "Battle", href: "/battle.html"},
 ];
 
 var extraButtons = [
