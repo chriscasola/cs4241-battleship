@@ -57,8 +57,27 @@ def check_bounds(the_ship)
     end
 end
 
-def send_ships()
-    
+def send_ships(battleid)
+    query = "SELECT * FROM battle_positions WHERE battleid=#{battleid};"
+    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+    begin
+        result = conn.exec(query)
+    rescue
+        conn.finish()
+        return 'error'
+    end
+    if (result.ntuples() > 0)
+        response = Array.new
+        result.each do |row|
+            response << {'battleid' => row['battleid'], 'playerid' => row['playerid'], 'xpos' => row['xpos'], 'ypos' => row['ypos'], 'stype' => row['stype'], 'orientation' => row['orientation'], 'afloat' => row['afloat']}
+        end
+        conn.finish()
+        return response.to_json
+    else
+        response = 'none'
+        conn.finish()
+        return response
+    end 
 end
 
 def receive_shot(json_req)
@@ -90,12 +109,14 @@ def receive_shot(json_req)
     return the_shot.to_json
 end
 
-def send_shots(last_received)
+def send_shots(request)
+    state = JSON.parse(request)
     query =
-    <<EOS
+<<EOS
 SELECT moveid, battleid, playerid, xpos, ypos, hit
 FROM battle_moves
-WHERE moveid > #{last_received};
+WHERE moveid > #{state['last_shot']}
+AND battleid = #{state['battleid']};
 EOS
 
     conn = connectToDB(ENV['SHARED_DATABASE_URL'])

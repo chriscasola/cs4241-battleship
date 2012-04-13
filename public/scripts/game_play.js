@@ -50,6 +50,7 @@ function getShips() {
 	$.ajax({
 	  type: 'POST',
 	  url: '/api/get_ships',
+	  data: localStorage['battleid'].toString(),
 	  success: receiveShips,
 	  dataType: 'text'
 	});
@@ -73,7 +74,7 @@ function listenForMoves() {
 	$.ajax({
 	  type: 'POST',
 	  url: '/api/check_shot',
-	  data: last_shot_received.toString(),
+	  data: JSON.stringify({last_shot: last_shot_received, battleid: localStorage['battleid']}),
 	  success: receiveOtherShot,
 	  dataType: 'text'
 	});

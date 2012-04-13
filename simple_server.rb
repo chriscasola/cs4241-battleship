@@ -50,7 +50,7 @@ post '/api/ship' do
 end
 
 post '/api/get_ships' do
-    send_ships()
+    send_ships(request.body.read)
 end
 
 get '/db_manager' do
