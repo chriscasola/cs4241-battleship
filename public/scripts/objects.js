@@ -17,6 +17,9 @@ function Ship (battleid, playerid, xpos, ypos, shiptype, orientation, afloat) {
 	this.afloat = afloat;
 }
 
+/*
+ * Draws the Ship on the given canvas
+ */
 Ship.prototype.draw = function (canvas) {
 	var context = canvas.getContext("2d");
 	var width = 0;

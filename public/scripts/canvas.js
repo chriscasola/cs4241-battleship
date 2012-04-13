@@ -23,9 +23,13 @@ window.onload = function () {
 	// Set battle information
 	localStorage['battleid'] = "1";
 	
+	// Retrieve ships already placed
+	getShips();
+	
 	// Listen for moves from server
 	listenForMoves();
 	
+	// Listen for ship placement
 	leftCanvas.addEventListener("mouseup", placeShip, false);
 }
 

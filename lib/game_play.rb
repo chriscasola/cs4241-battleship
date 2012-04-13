@@ -13,7 +13,26 @@ def receive_ship(json_req)
     if (check_bounds(the_ship) == false)
         return 'invalid'
     end
-
+    
+    # TODO make sure the user hasn't already placed a ship of this type
+    
+    # TODO make sure the ship doesn't overlap any other ships
+    
+    sql_InsertShip = 
+<<EOS
+INSERT INTO battle_positions
+VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['shiptype']}', '#{the_ship['orientation']}', '#{the_ship['afloat']}')
+EOS
+    
+    begin
+    #store the ship in db
+        conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+        conn.exec(sql_InsertShip)
+        conn.finish()
+    rescue
+        conn.finish()
+        return 'invalid'
+    end
     return the_ship.to_json
 end
 
@@ -28,8 +47,18 @@ def check_bounds(the_ship)
             return false;
         end
     elsif (the_ship['orientation'] == 'horizontal')
-
+        if ((the_ship['ypos'] > 9) || (the_ship['ypos'] < 0))
+            return false;
+        elsif ((the_ship['xpos'] + ship_lengths[the_ship['shiptype']]) >= 11)
+            return false;
+        elsif (the_ship['xpos'] < 0)
+            return false;
+        end
     end
+end
+
+def send_ships()
+    
 end
 
 def receive_shot(json_req)

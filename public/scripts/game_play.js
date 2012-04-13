@@ -46,6 +46,29 @@ function canvasClick(event) {
 	thisShot.send();
 }
 
+function getShips() {
+	$.ajax({
+	  type: 'POST',
+	  url: '/api/get_ships',
+	  success: receiveShips,
+	  dataType: 'text'
+	});
+}
+
+function receiveShips(response) {
+	if (response != 'none') {
+		ship_list = eval('(' + response + ')');
+		
+		var i;
+		for (i = 0; i < ship_list.length; i++) {
+			var ship_obj = ship_list[i];
+			var the_ship = new Ship(parseInt(ship_obj.battleid), parseInt(ship_obj.playerid), parseInt(ship_obj.xpos), parseInt(ship_obj.ypos), ship_obj.stype, ship_obj.orientation, true);
+			the_ship.afloat = (ship_obj.afloat == 't') ? true : false;
+			the_ship.draw(leftCanvas);
+		}
+	}
+}
+
 function listenForMoves() {
 	$.ajax({
 	  type: 'POST',
