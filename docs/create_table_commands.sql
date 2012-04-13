@@ -104,7 +104,7 @@ CREATE TABLE battle_positions (
 	stype shiptype NOT NULL,
 	orientation orientation NOT NULL,
 	afloat boolean DEFAULT true,
-	CONSTRAINT pk_ships PRIMARY KEY (battleid, playerid, xpos, ypos)
+	CONSTRAINT pk_ships PRIMARY KEY (battleid, playerid, stype)
 );
 
 /**

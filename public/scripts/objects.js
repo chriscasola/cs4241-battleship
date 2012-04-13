@@ -239,6 +239,9 @@ function receiveShot(response) {
 	if (response == 'invalid') {
 		alert('Invalid shot');
 	}
+	else if (response == 'ships_missing') {
+		alert('The other player has not placed all their ships yet');
+	}
 	else {
 		var shot_obj = eval('(' + response + ')');
 		var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit, shot_obj.id);

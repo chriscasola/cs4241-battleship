@@ -50,7 +50,7 @@ function getShips() {
 	$.ajax({
 	  type: 'POST',
 	  url: '/api/get_ships',
-	  data: localStorage['battleid'].toString(),
+	  data: JSON.stringify({battleid: localStorage['battleid'], playerid: localStorage['playerid']}),
 	  success: receiveShips,
 	  dataType: 'text'
 	});

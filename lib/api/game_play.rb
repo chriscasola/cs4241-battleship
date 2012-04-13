@@ -14,8 +14,6 @@ def receive_ship(json_req)
         return 'invalid'
     end
     
-    # TODO make sure the user hasn't already placed a ship of this type
-    
     # TODO make sure the ship doesn't overlap any other ships
     
     sql_InsertShip = 
@@ -57,8 +55,11 @@ def check_bounds(the_ship)
     end
 end
 
-def send_ships(battleid)
-    query = "SELECT * FROM battle_positions WHERE battleid=#{battleid};"
+def send_ships(request)
+    state = JSON.parse(request)
+    battleid = state['battleid']
+    playerid = state['playerid']
+    query = "SELECT * FROM battle_positions WHERE battleid=#{battleid} AND playerid=#{playerid};"
     conn = connectToDB(ENV['SHARED_DATABASE_URL'])
     begin
         result = conn.exec(query)
@@ -82,16 +83,17 @@ end
 
 def receive_shot(json_req)
     the_shot = JSON.parse(json_req)
-    if (rand(100) < 30)
-        the_shot["hit"] = true
-    else
-        the_shot["hit"] = false
-    end
 
     if (verify_shot(the_shot) == false)
         return 'invalid'
     end
-
+ 
+    begin
+        is_hit!(the_shot)
+    rescue
+        return 'ships_missing'
+    end
+    
     begin
     #store the shot in db
         conn = connectToDB(ENV['SHARED_DATABASE_URL'])
@@ -107,6 +109,44 @@ def receive_shot(json_req)
         return 'invalid'
     end
     return the_shot.to_json
+end
+
+def is_hit!(the_shot)
+    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+
+    # Get all the opponent's ships
+    ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' => 3, 'destroyer' => 2}
+    query = "SELECT xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']};"
+    result = conn.exec(query)
+    if (result.ntuples() < 5)
+    	conn.finish()
+        raise
+    end
+
+    result.each do |row|
+        if (row['orientation'] == 'horizontal')
+            if (row['ypos'].to_i == the_shot['ypos'].to_i)
+            	if (the_shot['xpos'].to_i < row['xpos'].to_i + ship_lengths[row['stype']])
+                    if (the_shot['xpos'].to_i >= row['xpos'].to_i)
+                        the_shot['hit'] = true
+                        break
+                    end
+                end
+            end
+        else
+            if (row['xpos'].to_i == the_shot['xpos'].to_i)
+                if (the_shot['ypos'].to_i < row['ypos'].to_i + ship_lengths[row['stype']])
+                    if (the_shot['ypos'].to_i >= row['ypos'].to_i)
+                        the_shot['hit'] = true
+                        break
+                    end
+                end
+            end
+        end
+    end
+    conn.finish()
+    # TODO update the afloat value if necessary
+    # TODO if ship is sunk, alert the ship's owner
 end
 
 def send_shots(request)
