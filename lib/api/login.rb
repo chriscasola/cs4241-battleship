@@ -1,14 +1,16 @@
 =begin
-  TODO: Complete this comment.
+  This file contains the login api function.
   
   @author Chris Page
-  @version 4/4/2012
+  @version 4/12/2012
 =end
 
 require 'digest/sha2'
 require 'dbmgr'
 require 'iconv'
 require 'json'
+require 'tools/hashPassword'
+require 'tools/inputValidator'
 
 SQL_SelectUserIdViaCredentials = 
 <<EOS
@@ -24,44 +26,6 @@ VALUES ('%%sessionid%%', %%userid%%);
 EOS
 
 JSON_Output = {'success' => false, 'name' => '', 'userid' => -1, 'sessionid' => -1, 'error' => ''}
-
-# Checks whether or not the given email is an actual email address.
-#
-# @param [String] email The email to check.
-#
-# @return [boolean] True if the email is a valid email. False otherwise.
-def validateEmail(email)
-  if (email == nil)
-    return false
-  end
-  
-  # TODO Until this function is correctly implemented, it causes a horrendous security vulnerability.
-  return true # TODO This is wrong. Finish this function.
-end
-
-# Checks whether or not the password is valid.
-#
-# @param [String] password The password to check.
-#
-# @return [boolean] True if the password is valid. False otherwise.
-def validatePassword(password)
-  if (password == nil)
-    return false
-  end
-  
-  return true # TODO This is wrong. Finish this function.
-end
-
-# Hashes a password before checking the database
-#
-# @param [String] password The password to hash.
-#
-# @return [String] The hashed password.
-def hashPassword(password)
-  sha256 = Digest::SHA256.new
-  hashedPwd = sha256.hexdigest(password)
-  return hashedPwd
-end
 
 # Generates a unique session id.
 #
