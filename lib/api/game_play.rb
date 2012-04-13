@@ -1,4 +1,4 @@
-require 'dbmgr'
+require 'api/dbmgr'
 require 'json'
 
 SQL_InsertBattleMove =

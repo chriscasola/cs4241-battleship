@@ -10,10 +10,10 @@
 $: << File.expand_path(File.dirname(__FILE__) + "/lib")
 
 require 'sinatra'
-require 'dbmgr'
+require 'api/dbmgr'
 require 'api/login'
 require 'api/register'
-require 'game_play'
+require 'api/game_play'
 require 'json'
 
 set :public_folder, File.dirname(__FILE__) + '/public'
@@ -47,6 +47,10 @@ end
 
 post '/api/ship' do
   receive_ship(request.body.read)
+end
+
+post '/api/get_ships' do
+    send_ships()
 end
 
 get '/db_manager' do

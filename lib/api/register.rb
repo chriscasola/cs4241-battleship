@@ -7,7 +7,7 @@
 
 require 'tools/hashPassword'
 require 'tools/inputValidator'
-require 'dbmgr'
+require 'api/dbmgr'
 
 SQL_SelectEmailFromUsers = 
 <<EOS

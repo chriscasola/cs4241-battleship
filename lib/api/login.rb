@@ -6,7 +6,7 @@
 =end
 
 require 'digest/sha2'
-require 'dbmgr'
+require 'api/dbmgr'
 require 'iconv'
 require 'json'
 require 'tools/hashPassword'
