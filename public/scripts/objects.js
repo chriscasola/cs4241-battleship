@@ -7,12 +7,12 @@
 /*
  * An object that represents a Ship
  */
-function Ship (battleid, playerid, xpos, ypos, shiptype, orientation, afloat) {
+function Ship (battleid, playerid, xpos, ypos, stype, orientation, afloat) {
 	this.battleid = battleid;
 	this.playerid = playerid;
 	this.xpos = xpos;
 	this.ypos = ypos;
-	this.shiptype = shiptype;
+	this.stype = stype;
 	this.orientation = orientation;
 	this.afloat = afloat;
 }
@@ -28,7 +28,7 @@ Ship.prototype.draw = function (canvas) {
 	var canvas_x;
 	var canvas_y;
 	
-	switch (this.shiptype) {
+	switch (this.stype) {
 		case 'carrier':
 			if (this.orientation == 'vertical') {
 				width = 15;
@@ -138,7 +138,7 @@ function receiveShip(response) {
 	}
 	else {
 		var ship_obj = eval('(' + response + ')');
-		var the_ship = new Ship(ship_obj.battleid, ship_obj.playerid, ship_obj.xpos, ship_obj.ypos, ship_obj.shiptype, ship_obj.orientation, ship_obj.afloat);
+		var the_ship = new Ship(ship_obj.battleid, ship_obj.playerid, ship_obj.xpos, ship_obj.ypos, ship_obj.stype, ship_obj.orientation, ship_obj.afloat);
 		the_ship.draw(leftCanvas);
 	}
 }

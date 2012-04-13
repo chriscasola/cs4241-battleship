@@ -7,6 +7,10 @@ INSERT INTO battle_moves(battleid, playerid, xpos, ypos, hit)
 VALUES (%%battleid%%, %%playerid%%, %%xpos%%, %%ypos%%, %%hit%%);
 EOS
 
+Ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' => 3, 'destroyer' => 2}
+
+# TODO deal with keeping tack of which player's turn it is, who can fire a shot
+
 def receive_ship(json_req)
     the_ship = JSON.parse(json_req)
 
@@ -14,12 +18,16 @@ def receive_ship(json_req)
         return 'invalid'
     end
     
+    if (check_overlap(the_ship) == false)
+    	return 'invalid'
+    end
+    
     # TODO make sure the ship doesn't overlap any other ships
     
     sql_InsertShip = 
 <<EOS
 INSERT INTO battle_positions
-VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['shiptype']}', '#{the_ship['orientation']}', '#{the_ship['afloat']}')
+VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['stype']}', '#{the_ship['orientation']}', '#{the_ship['afloat']}')
 EOS
     
     begin
@@ -34,25 +42,71 @@ EOS
     return the_ship.to_json
 end
 
+def check_overlap(the_ship)
+	query = "SELECT xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']};"
+	conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+	result = conn.exec(query)
+	
+	# Check if there are any ships, if not no need to check overlap
+	if (result.ntuples() == 0)
+		return true
+	end
+	
+	ship_loc = get_ship_coordinates(the_ship)
+	
+	# check each existing ship for overlap
+	result.each do |row|
+		row_loc = get_ship_coordinates(row)
+		if ((row['orientation'] == 'vertical') && (the_ship['orientation'] == 'horizontal'))
+			if ((ship_loc[:beg_y] <= row_loc[:end_y]) && (ship_loc[:beg_y] >= row_loc[:beg_y]))
+				if ((row_loc[:beg_x] <= ship_loc[:end_x]) && (row_loc[:beg_x] >= ship_loc[:beg_x]))
+					return false
+				end
+			end
+		end
+		
+		# TODO other 3 conditions
+	end
+	return true
+end
+
+def get_ship_coordinates(the_ship)
+	# get the start and end coordinates of the_ship
+	ship_beg_x = 0
+	ship_beg_y = 0
+	ship_end_x = 0
+	ship_end_y = 0
+	if (the_ship['orientation'] == 'vertical')
+		ship_beg_x = ship_end_x = the_ship['xpos'].to_i
+		ship_beg_y = the_ship['ypos'].to_i
+		ship_end_y = ship_beg_y + Ship_lengths[the_ship['stype']] - 1
+	else
+		ship_beg_y = ship_end_y = the_ship['ypos'].to_i
+		ship_beg_x = the_ship['xpos'].to_i
+		ship_end_x = ship_beg_x + Ship_lengths[the_ship['stype']] - 1
+	end
+	return {:beg_x => ship_beg_x, :beg_y => ship_beg_y, :end_x => ship_end_x, :end_y => ship_end_y}
+end
+
 def check_bounds(the_ship)
-    ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' => 3, 'destroyer' => 2}
     if (the_ship['orientation'] == 'vertical')
         if ((the_ship['xpos'] > 9) || (the_ship['xpos'] < 0))
-            return false;
-        elsif ((the_ship['ypos'] + ship_lengths[the_ship['shiptype']]) >= 11)
-            return false;
+            return false
+        elsif ((the_ship['ypos'] + Ship_lengths[the_ship['stype']]) >= 11)
+            return false
         elsif (the_ship['ypos'] < 0)
-            return false;
+            return false
         end
     elsif (the_ship['orientation'] == 'horizontal')
         if ((the_ship['ypos'] > 9) || (the_ship['ypos'] < 0))
-            return false;
-        elsif ((the_ship['xpos'] + ship_lengths[the_ship['shiptype']]) >= 11)
-            return false;
+            return false
+        elsif ((the_ship['xpos'] + Ship_lengths[the_ship['stype']]) >= 11)
+            return false
         elsif (the_ship['xpos'] < 0)
-            return false;
+            return false
         end
     end
+    return true
 end
 
 def send_ships(request)
@@ -115,7 +169,6 @@ def is_hit!(the_shot)
     conn = connectToDB(ENV['SHARED_DATABASE_URL'])
 
     # Get all the opponent's ships
-    ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' => 3, 'destroyer' => 2}
     query = "SELECT xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']};"
     result = conn.exec(query)
     if (result.ntuples() < 5)
@@ -126,7 +179,7 @@ def is_hit!(the_shot)
     result.each do |row|
         if (row['orientation'] == 'horizontal')
             if (row['ypos'].to_i == the_shot['ypos'].to_i)
-            	if (the_shot['xpos'].to_i < row['xpos'].to_i + ship_lengths[row['stype']])
+            	if (the_shot['xpos'].to_i < row['xpos'].to_i + Ship_lengths[row['stype']])
                     if (the_shot['xpos'].to_i >= row['xpos'].to_i)
                         the_shot['hit'] = true
                         break
@@ -135,7 +188,7 @@ def is_hit!(the_shot)
             end
         else
             if (row['xpos'].to_i == the_shot['xpos'].to_i)
-                if (the_shot['ypos'].to_i < row['ypos'].to_i + ship_lengths[row['stype']])
+                if (the_shot['ypos'].to_i < row['ypos'].to_i + Ship_lengths[row['stype']])
                     if (the_shot['ypos'].to_i >= row['ypos'].to_i)
                         the_shot['hit'] = true
                         break
@@ -182,7 +235,7 @@ end
 
 def verify_shot(the_shot)
     if ((the_shot["xpos"] > 9) || (the_shot["xpos"] < 0) || (the_shot["ypos"] > 9) || (the_shot["ypos"] < 0))
-    return false
+    	return false
     end
     return true
 end
