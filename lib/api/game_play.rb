@@ -218,6 +218,12 @@ def is_hit!(the_shot)
     # TODO if ship is sunk, alert the ship's owner
 end
 
+def increment_hits(the_ship)
+	# TODO take relevant row from function above and update numhits value in battle_positions table
+end
+
+# TODO rework the polling that the client does so it can handle multiple message, then imlement function to alert client to sunk ships
+
 def send_shots(request)
     state = JSON.parse(request)
     query =

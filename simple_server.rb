@@ -20,58 +20,50 @@ require 'api/register'
 require 'api/game_play'
 require 'json'
 
-#4567
+set :static, true
+set :public, File.dirname(__FILE__) + '/public'
 
- #class BattleShip < Sinatra::Base
- 	set :static, true
-    set :public, File.dirname(__FILE__) + '/public'
+use LoginApi
 
-    use LoginApi
-
-    #configure do
-    #  enable :sessions
-    #end
-    
-    get '/' do
-        redirect 'http://' + request.host_with_port() + '/index.html'
-    end
-
-    get '/test' do
-        unless (request.env['HTTP_X_FORWARDED_PROTO'] || request.env['rack.url_scheme'])=='https'
-            redirect 'https://' + request.host_with_port() + '/test'
-        end
-        'success!'
-    end
-
-    post '/api/shot' do
-        receive_shot(request.body.read)
-    end
-
-    post '/api/check_shot' do
-        send_shots(request.body.read)
-    end
-
-    post '/api/ship' do
-        receive_ship(request.body.read)
-    end
-
-    post '/api/get_ships' do
-        send_ships(request.body.read)
-    end
-
-    get '/db_manager' do
-        runDBShell(ENV['SHARED_DATABASE_URL'])
-    end
-
-    post '/db_manager' do
-        runDBShell(ENV['SHARED_DATABASE_URL'], params)
-    end
-
-    get '*' do
-        "Path: " + request.fullpath()
-    end
-
-	#run! if app_file == $0#
+#configure do
+#  enable :sessions
 #end
 
-#BattleShip.run!
+get '/' do
+    redirect 'http://' + request.host_with_port() + '/index.html'
+end
+
+get '/test' do
+    unless (request.env['HTTP_X_FORWARDED_PROTO'] || request.env['rack.url_scheme'])=='https'
+        redirect 'https://' + request.host_with_port() + '/test'
+    end
+    'success!'
+end
+
+post '/api/shot' do
+    receive_shot(request.body.read)
+end
+
+post '/api/check_shot' do
+    send_shots(request.body.read)
+end
+
+post '/api/ship' do
+    receive_ship(request.body.read)
+end
+
+post '/api/get_ships' do
+    send_ships(request.body.read)
+end
+
+get '/db_manager' do
+    runDBShell(ENV['SHARED_DATABASE_URL'])
+end
+
+post '/db_manager' do
+    runDBShell(ENV['SHARED_DATABASE_URL'], params)
+end
+
+get '*' do
+    "Path: " + request.fullpath()
+end
