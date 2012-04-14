@@ -1,5 +1,5 @@
 =begin
-  This file contains the register api function.
+  This file contains the RegisterApi class.
   
   @author Chris Page
   @version 4/14/2012
@@ -8,42 +8,56 @@
 require 'sinatra/base'
 require 'tools/hashPassword'
 require 'tools/inputValidator'
-require 'api/dbmgr'
+require 'tools/dbTools'
 
+# This class handles the server side registration stuff
 class RegisterApi < Sinatra::Base
 
+	# SQL statement for selecting an email from the users table given an email
     @@SQL_SelectEmailFromUsers =
 <<EOS
 SELECT email FROM users
 WHERE email='%%email%%';
 EOS
 
+	# SQL statement for selecting a name from the users table given a name
     @@SQL_SelectNameFromUsers =
 <<EOS
 SELECT name FROM users
 WHERE name='%%name%%';
 EOS
 
+	# SQL statement for inserting a new record into the users table
     @@SQL_InsertUserRecord =
 <<EOS
 INSERT INTO users (name, email, password)
 VALUES ('%%name%%', %%email%%, %%password%%);
 EOS
 
+	# JSON returned if registration was successful
 	@@JSON_Success = {'success' => true}
+	
+	# JSON returned if registration was unsuccessful
 	@@JSON_Failure = {'success' => false, 'error' => ''}
     
+    # Path for register api post
     post '/api/register' do
   		register(params[:email], params[:password1], params[:password2], params[:name])
 	end
-
+	
+	# Attempts to register a new user with the given information.
+    #
+    # @param [String] email The user's email address.
+    # @param [String] password1  The user's password.
+    # @param [String] password2  The user's password (confirmation).
+    # @param [String] name	The user's name.
     def register (email, password1, password2, name)
         # If the email, password, and name are valid
         if (validateEmail(email) && validatePassword(password1) && validatePassword(password2) && validateName(name))
 
             # If the passwords match
             if (password1 == password2)
-                conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+                conn = DBTools.new.connectToDB()
 
                 # Check if email is already in the database
                 query = @@SQL_SelectEmailFromUsers.gsub(/%%email%%/, email)

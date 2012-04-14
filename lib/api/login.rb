@@ -1,18 +1,19 @@
 =begin
-  This file contains the login api function.
+  This file contains the LoginApi class.
   
   @author Chris Page
-  @version 4/12/2012
+  @version 4/14/2012
 =end
 
 require 'sinatra/base'
 require 'digest/sha2'
-require 'api/dbmgr'
 require 'iconv'
 require 'json'
 require 'tools/hashPassword'
 require 'tools/inputValidator'
+require 'tools/dbTools'
 
+# This class handles the server-side login stuff.
 class LoginApi < Sinatra::Base
 	
 	# Enable sessions
@@ -39,6 +40,7 @@ EOS
     # JSON returned if login was unsuccessful
     @@JSON_LoginFailed = {'success' => false, 'error' => ''}
     
+    # Path for login api post
     post '/api/login' do
   		login(params[:email], params[:password])
 	end
@@ -64,7 +66,7 @@ EOS
 
         # If the email and password are valid
         if (validateEmail(email) && validatePassword(password))
-            conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+            conn = DBTools.new.connectToDB()
 
             # Get userid based on credentials. There will be no results if the credentials are wrong.
             # TODO Escape the email.
