@@ -22,8 +22,6 @@ def receive_ship(json_req)
     	return 'invalid'
     end
     
-    # TODO make sure the ship doesn't overlap any other ships
-    
     sql_InsertShip = 
 <<EOS
 INSERT INTO battle_positions
