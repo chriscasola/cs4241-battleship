@@ -24,10 +24,7 @@ set :static, true
 set :public, File.dirname(__FILE__) + '/public'
 
 use LoginApi
-
-#configure do
-#  enable :sessions
-#end
+use RegisterApi
 
 get '/' do
     redirect 'http://' + request.host_with_port() + '/index.html'
