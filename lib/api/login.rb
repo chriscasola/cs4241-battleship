@@ -5,6 +5,7 @@
   @version 4/12/2012
 =end
 
+require 'sinatra/base'
 require 'digest/sha2'
 require 'api/dbmgr'
 require 'iconv'
@@ -12,103 +13,122 @@ require 'json'
 require 'tools/hashPassword'
 require 'tools/inputValidator'
 
-SQL_SelectUserIdViaCredentials = 
+class LoginApi < Sinatra::Base
+	
+	# Enable sessions
+	enable :sessions
+	
+	# SQL statement for selecting a user id given an email and a hashed password
+    @@SQL_SelectUserIdViaCredentials =
 <<EOS
 SELECT userid, name FROM users
 WHERE email='%%email%%'
 AND password='%%password%%';
 EOS
-
-SQL_InsertNewOnlineRecord = 
+	
+	# SQL statement for inserting a new record into the user's online table
+    @@SQL_InsertNewOnlineRecord =
 <<EOS
 INSERT INTO users_online (sessionid, userid)
 VALUES ('%%sessionid%%', %%userid%%);
 EOS
-
-JSON_Output = {'success' => false, 'name' => '', 'userid' => -1, 'sessionid' => -1, 'error' => ''}
-
-# Generates a unique session id.
-#
-# @param [Integer] userid The userid.
-#
-# @return [String] A unique session id.
-def generateUniqueSessionId(userId)
-  toHash = Time.now.to_s + userId.to_s
-  
-  sha256 = Digest::SHA256.new
-  hashedUSId = sha256.hexdigest(toHash)
-  return hashedUSId
-end
-
-# Attempts to log in a user with the given information.
-#
-# @param [String] email The user's email address.
-# @param [String] password  The user's password.
-def login(email, password)
-  
-  # If the email and password are valid
-  if (validateEmail(email) && validatePassword(password))
-    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+	
+	# JSON returned if login was successful
+    @@JSON_LoginSuccessful = {'success' => true, 'name' => '', 'userid' => -1, 'sessionid' => -1}
     
-    # Get userid based on credentials. There will be no results if the credentials are wrong.
-    # TODO Escape the email.
+    # JSON returned if login was unsuccessful
+    @@JSON_LoginFailed = {'success' => false, 'error' => ''}
     
-    query = SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password))
-    #ic = Iconv.new('UNICODE//IGNORE', 'UTF-8')
-    #query = ic.iconv(query)
-    results = conn.exec(query)
-    
-    # If the credentials are wrong (0 results)
-    if (results.ntuples == 0)
-      JSON_Output['success'] = false
-      JSON_Output['error'] = "Email or password not found."
-      conn.finish()
-      JSON.generate(JSON_Output)
-      
-    # If there are too many results (this should never occur)
-    elsif (results.ntuples > 1)
-      JSON_Output['success'] = false
-      JSON_Output['error'] = "Database is corrupt."
-      conn.finish()
-      JSON.generate(JSON_Output)
-      
-    # If the credentials are valid
-    else
-      userid = results[0]['userid']
-      name = results[0]['name']
-      results.clear()
-      sessionid = generateUniqueSessionId(userid)
-      
-      query = SQL_InsertNewOnlineRecord.gsub(/%%sessionid%%/, sessionid).gsub(/%%userid%%/, userid)
-      results = conn.exec(query)
-      
-      if (results.cmd_tuples() == 1)
-        # generate session cookie
-        session["sessionid"] = sessionid
-        
-        # return JSON
-        JSON_Output['success'] = true
-        JSON_Output['name'] = name
-        JSON_Output['userid'] = userid
-        JSON_Output['sessionid'] = sessionid
-        conn.finish()
-        
-        JSON.generate(JSON_Output)
-      else
-        JSON_Output['success'] = false
-        JSON_Output['error'] = "Session not inserted."
-        conn.finish()
-        
-        JSON.generate(JSON_Output)
-      end
+    post '/api/login' do
+  		login(params[:email], params[:password])
+	end
+
+    # Generates a unique session id.
+    #
+    # @param [Integer] userid The userid.
+    #
+    # @return [String] A unique session id.
+    def generateUniqueSessionId(userId)
+        toHash = Time.now.to_s + userId.to_s
+
+        sha256 = Digest::SHA256.new
+        hashedUSId = sha256.hexdigest(toHash)
+        return hashedUSId
     end
-    
-  # If the email or password is invalid.
-  else
-    JSON_Output['success'] = false
-    JSON_Output['error'] = "Email or password is invalid."
-    JSON.generate(JSON_Output)
-  end
-  
-  # TODO add library for checking if user is logged in
+
+    # Attempts to log in a user with the given information.
+    #
+    # @param [String] email The user's email address.
+    # @param [String] password  The user's password.
+    def login(email, password)
+
+        # If the email and password are valid
+        if (validateEmail(email) && validatePassword(password))
+            conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+
+            # Get userid based on credentials. There will be no results if the credentials are wrong.
+            # TODO Escape the email.
+
+            query = @@SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password))
+            #ic = Iconv.new('UNICODE//IGNORE', 'UTF-8')
+            #query = ic.iconv(query)
+            results = conn.exec(query)
+
+            # If the credentials are wrong (0 results)
+            if (results.ntuples == 0)
+            	json_output = @@JSON_LoginFailed
+                json_output['success'] = false
+                json_output['error'] = "Email or password not found."
+                conn.finish()
+                JSON.generate(json_output)
+
+            # If there are too many results (this should never occur)
+            elsif (results.ntuples > 1)
+            	json_output = @@JSON_LoginFailed
+                json_output['success'] = false
+                json_output['error'] = "Database is corrupt."
+                conn.finish()
+                JSON.generate(json_output)
+
+            # If the credentials are valid
+            else
+                userid = results[0]['userid']
+                name = results[0]['name']
+                results.clear()
+                sessionid = generateUniqueSessionId(userid)
+
+                query = @@SQL_InsertNewOnlineRecord.gsub(/%%sessionid%%/, sessionid).gsub(/%%userid%%/, userid)
+                results = conn.exec(query)
+
+                if (results.cmd_tuples() == 1)
+                    # generate session cookie
+                    session["sessionid"] = sessionid
+
+                    # return JSON
+            		json_output = @@JSON_LoginSuccessful
+                    json_output['success'] = true
+                    json_output['name'] = name
+                    json_output['userid'] = userid
+                    json_output['sessionid'] = sessionid
+                    conn.finish()
+
+                    JSON.generate(json_output)
+                else
+            		json_output = @@JSON_LoginFailed
+                    json_output['success'] = false
+                    json_output['error'] = "Session not inserted."
+                    conn.finish()
+
+                    JSON.generate(json_output)
+                end
+            end
+
+        # If the email or password is invalid.
+        else
+            json_output = @@JSON_LoginFailed
+            json_output['success'] = false
+            json_output['error'] = "Email or password is invalid."
+            JSON.generate(json_output)
+        end
+    end
 end
