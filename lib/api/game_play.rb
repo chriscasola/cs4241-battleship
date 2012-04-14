@@ -63,9 +63,27 @@ def check_overlap(the_ship)
 					return false
 				end
 			end
+		elsif ((row['orientation'] == 'horizontal') && (the_ship['orientation'] == 'vertical'))
+			if ((row_loc[:beg_y] <= ship_loc[:end_y]) && (row_loc[:beg_y] >= ship_loc[:beg_y]))
+				if ((ship_loc[:beg_x] <= row_loc[:end_x]) && (ship_loc[:beg_x] >= row_loc[:beg_x]))
+					return false
+				end
+			end
+		elsif ((row['orientation'] == 'horizontal') && (the_ship['orientation'] == 'horizontal'))
+			if (ship_loc[:beg_y] == row_loc[:beg_y])
+				if (((ship_loc[:beg_x] <= row_loc[:end_x]) && (ship_loc[:beg_x] >= row_loc[:beg_x])) || \
+					((ship_loc[:end_x] <= row_loc[:end_x]) && (ship_loc[:end_x] >= row_loc[:beg_x])))
+					return false
+				end
+			end
+		elsif ((row['orientation'] == 'vertical') && (the_ship['orientation'] == 'vertical'))
+			if (ship_loc[:beg_x] == row_loc[:beg_x])
+				if (((ship_loc[:beg_y] <= row_loc[:end_y]) && (ship_loc[:beg_y] >= row_loc[:beg_y])) || \
+					((ship_loc[:end_y] <= row_loc[:end_y]) && (ship_loc[:end_y] >= row_loc[:beg_y])))
+					return false
+				end
+			end
 		end
-		
-		# TODO other 3 conditions
 	end
 	return true
 end
