@@ -13,7 +13,7 @@
 # Add the lib directory to the search path
 $: << File.expand_path(File.dirname(__FILE__) + "/lib")
 
-require 'sinatra/base'
+require 'sinatra'
 require 'api/dbmgr'
 require 'api/login'
 require 'api/register'
@@ -22,7 +22,7 @@ require 'json'
 
 #4567
 
- class BattleShip < Sinatra::Base
+ #class BattleShip < Sinatra::Base
  	set :static, true
     set :public, File.dirname(__FILE__) + '/public'
 
@@ -71,6 +71,7 @@ require 'json'
         "Path: " + request.fullpath()
     end
 
-end
+	#run! if app_file == $0#
+#end
 
-BattleShip.run!
+#BattleShip.run!
