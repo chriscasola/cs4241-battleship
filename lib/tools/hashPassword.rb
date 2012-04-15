@@ -5,6 +5,8 @@
   @version 4/12/2012
 =end
 
+require 'digest/sha2'
+
 # Hashes a password
 #
 # @param [String] password The password to hash.
