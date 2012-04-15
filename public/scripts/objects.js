@@ -242,9 +242,15 @@ function receiveShot(response) {
 	else if (response == 'ships_missing') {
 		alert('The other player has not placed all their ships yet');
 	}
+	else if (response == 'not your turn') {
+		alert('It is not your turn');
+	}
 	else {
 		var shot_obj = eval('(' + response + ')');
 		var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit, shot_obj.id);
 		the_shot.draw(rightCanvas);
+		if (shot_obj.sunk == true) {
+			alert ('Congratulations! You sunk their ship.');
+		}
 	}
 }

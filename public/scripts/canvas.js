@@ -26,8 +26,8 @@ window.onload = function () {
 	// Retrieve ships already placed
 	getShips();
 	
-	// Listen for moves from server
-	listenForMoves();
+	// Listen for updates from server
+	listenForUpdates();
 	
 	// Listen for ship placement
 	leftCanvas.addEventListener("mouseup", placeShip, false);

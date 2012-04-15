@@ -9,8 +9,6 @@ EOS
 
 Ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' => 3, 'destroyer' => 2}
 
-# TODO deal with keeping tack of which player's turn it is, who can fire a shot
-
 def receive_ship(json_req)
     the_ship = JSON.parse(json_req)
 
@@ -25,7 +23,7 @@ def receive_ship(json_req)
     sql_InsertShip = 
 <<EOS
 INSERT INTO battle_positions
-VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['stype']}', '#{the_ship['orientation']}', '#{the_ship['afloat']}')
+VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['stype']}', '#{the_ship['orientation']}', '#{the_ship['afloat']}', 0)
 EOS
     
     begin
@@ -153,16 +151,20 @@ end
 
 def receive_shot(json_req)
     the_shot = JSON.parse(json_req)
+    
+    if (is_my_turn(the_shot) == false)
+    	return 'not your turn'
+    end
 
     if (verify_shot(the_shot) == false)
         return 'invalid'
     end
  
-    begin
+    #begin
         is_hit!(the_shot)
-    rescue
-        return 'ships_missing'
-    end
+    #rescue
+    #    return 'ships_missing'
+    #end
     
     begin
     #store the shot in db
@@ -181,11 +183,41 @@ def receive_shot(json_req)
     return the_shot.to_json
 end
 
+def is_my_turn(the_shot)
+	# Find out whose turn it is
+	query = "SELECT p1id, p2id, status FROM battles WHERE battleid=#{the_shot['battleid']};"
+	conn = connectToDB(ENV['SHARED_DATABASE_URL'])
+	result = conn.exec(query)
+	my_turn = false
+	if ((result[0]['status'] == 'p1turn') && (result[0]['p1id'].to_i == the_shot['playerid'].to_i))
+		# It is my turn
+		my_turn = true
+		
+		# Change battle status in database
+		query = "UPDATE battles SET status='p2turn' WHERE battleid=#{the_shot['battleid']};"
+		conn.exec(query)
+		
+	elsif ((result[0]['status'] == 'p2turn') && (result[0]['p2id'].to_i == the_shot['playerid'].to_i))
+		# It is my turn
+		my_turn = true
+		
+		# Change battle status in database
+		query = "UPDATE battles SET status='p1turn' WHERE battleid=#{the_shot['battleid']};"
+		conn.exec(query)
+		
+	else
+		# It is not my turn
+		my_turn = false
+	end
+	conn.finish()
+	return my_turn
+end
+
 def is_hit!(the_shot)
     conn = connectToDB(ENV['SHARED_DATABASE_URL'])
-
+	is_sunk = false
     # Get all the opponent's ships
-    query = "SELECT xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']};"
+    query = "SELECT battleid, playerid, xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']};"
     result = conn.exec(query)
     if (result.ntuples() < 5)
     	conn.finish()
@@ -193,36 +225,39 @@ def is_hit!(the_shot)
     end
 
     result.each do |row|
-        if (row['orientation'] == 'horizontal')
-            if (row['ypos'].to_i == the_shot['ypos'].to_i)
-            	if (the_shot['xpos'].to_i < row['xpos'].to_i + Ship_lengths[row['stype']])
-                    if (the_shot['xpos'].to_i >= row['xpos'].to_i)
-                        the_shot['hit'] = true
-                        break
-                    end
-                end
-            end
-        else
-            if (row['xpos'].to_i == the_shot['xpos'].to_i)
-                if (the_shot['ypos'].to_i < row['ypos'].to_i + Ship_lengths[row['stype']])
-                    if (the_shot['ypos'].to_i >= row['ypos'].to_i)
-                        the_shot['hit'] = true
-                        break
-                    end
-                end
+        if ((row['orientation'] == 'horizontal') && # deals with checking horizontally placed ships
+            (row['ypos'].to_i == the_shot['ypos'].to_i) && # check if the y positions match
+            (the_shot['xpos'].to_i < row['xpos'].to_i + Ship_lengths[row['stype']]) && # check if the x position is within the ship
+            (the_shot['xpos'].to_i >= row['xpos'].to_i))
+            is_sunk = increment_hits(row, conn)
+			the_shot['hit'] = true
+            break
+        else # deal with vertically placed ships
+            if ((row['xpos'].to_i == the_shot['xpos'].to_i) && # check if x positions match
+				(the_shot['ypos'].to_i < row['ypos'].to_i + Ship_lengths[row['stype']]) && # check if the y position is within the ship
+				(the_shot['ypos'].to_i >= row['ypos'].to_i))
+	            is_sunk = increment_hits(row, conn)
+	            the_shot['hit'] = true
+	            break
             end
         end
     end
     conn.finish()
-    # TODO update the afloat value if necessary
-    # TODO if ship is sunk, alert the ship's owner
+    the_shot['sunk'] = is_sunk
 end
 
-def increment_hits(the_ship)
-	# TODO take relevant row from function above and update numhits value in battle_positions table
+def increment_hits(the_ship, conn)
+	query = "UPDATE battle_positions SET numhits=(numhits + 1) WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']} AND stype='#{the_ship['stype']}';"
+	conn.exec(query)
+	query = "SELECT numhits FROM battle_positions WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']} AND stype='#{the_ship['stype']}';"
+	result = conn.exec(query)
+	if (result[0]['numhits'].to_i == Ship_lengths[the_ship['stype']])
+		query = "UPDATE battle_positions SET afloat='false' WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']} AND stype='#{the_ship['stype']}';"
+		conn.exec(query)
+		return true
+	end
+	return false
 end
-
-# TODO rework the polling that the client does so it can handle multiple message, then imlement function to alert client to sunk ships
 
 def send_shots(request)
     state = JSON.parse(request)
@@ -246,12 +281,12 @@ EOS
         result.each do |row|
             response << {'battleid' => row['battleid'], 'playerid' => row['playerid'], 'xpos' => row['xpos'], 'ypos' => row['ypos'], 'hit' => row['hit'], 'id' => row['moveid']}
         end
-    conn.finish()
-    return response.to_json
+    	conn.finish()
+    	return {'type' => 'shot', 'content' => response}.to_json
     else
-        response = 'none'
-    conn.finish()
-    return response
+        response = {'type' => 'info', 'message' => 'none'}.to_json
+    	conn.finish()
+    	return response
     end
 end
 
