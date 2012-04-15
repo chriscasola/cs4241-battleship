@@ -10,8 +10,8 @@ var sectionNames = [
 ];
 
 var extraButtons = [
-	{title: "Login", href: "/login.html"},
-	{title: "Register", href: "/index.html"},
+	{title: "Login", href: null, onclick: "showLoginOverlay()"},
+	{title: "Register", href: "/index.html", onclick: null},
 ];
 
 function generateTopMenu() {
@@ -28,7 +28,15 @@ function generateTopMenu() {
 	}
 	
 	for (i=0; i<extraButtons.length; i++) {
-		menuHTML += '<li class="rightSide"><a href="' + extraButtons[i].href + '"><p>' + extraButtons[i].title + '</p></a></li>';
+		menuHTML += '<li class="rightSide">';
+		menuHTML += '<a';
+		if (extraButtons[i].href != null) {
+			menuHTML += ' href="' + extraButtons[i].href + '"';
+		}
+		if (extraButtons[i].onclick != null) {
+			menuHTML += ' onclick="' + extraButtons[i].onclick + '"';
+		}
+		menuHTML += '><p>' + extraButtons[i].title + '</p></a></li>';
 	}
 	menuHTML += '</ul></nav>'
 	document.write(menuHTML);

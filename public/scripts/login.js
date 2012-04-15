@@ -1,18 +1,73 @@
+/**
+ * TODO This comment.
+ * 
+ * TODO Work on the overlay some more. Need to be able to close it after login. Need to fix formatting.
+ * 
+ * @author Chris Page
+ */
 
-window.onload = function () {
-	document.getElementById('login').addEventListener('click', login, false);
-	document.getElementById('password').addEventListener('keyup', enterLogin, false);
+LoginBoxHTML =	'   <h1>Login</h1>' +
+				'	<br />' + 
+				'	<div>' + 
+				'		<table>' + 
+				'			<tr>' + 
+				'				<td>' + 
+				'					<label for="loginEmail">Email: </label>' + 
+				'				</td>' + 
+				'				<td>' + 
+				'					<input type="text" id="loginEmail" name="email" />' + 
+				'				</td>' + 
+				'			</tr>' + 
+				'			<tr>' + 
+				'				<td>' + 
+				'					<label for="loginPassword">Password: </label>' + 
+				'				</td>' + 
+				'				<td>' + 
+				'					<input type="password" id="loginPassword" name="password" />' + 
+				'				</td>' + 
+				'			</tr>' + 
+				'		</table>' + 
+				'		<input type="button" id="login" onclick="doLogin()" value="Login" />' + 
+				'		<p id="loginError"></p>' + 
+				'	</div>';
+				
+
+/**
+ * @see http://answers.oreilly.com/topic/1823-adding-a-page-overlay-in-javascript/
+ */
+function showLoginOverlay() {
+	var overlay = document.createElement("div");
+	overlay.setAttribute("id","loginOverlay");
+	overlay.setAttribute("class", "overlay");
+	document.body.appendChild(overlay);
+	
+	var loginBox = document.createElement("div");
+	loginBox.setAttribute("id","loginBox");
+	loginBox.innerHTML = LoginBoxHTML;
+	loginBox.innerHTML = LoginBoxHTML;
+	document.body.appendChild(loginBox);
 }
 
-function enterLogin(event) {
-	if (event.keyCode == 13) {
-		login();
-	}
+/**
+ * @see http://answers.oreilly.com/topic/1823-adding-a-page-overlay-in-javascript/
+ */
+function removeLoginOverlay() {
+	document.body.removeChild(document.getElementById("loginOverlay"));
+	document.body.removeChild(document.getElementById("loginBox"));
 }
 
-function login (event) {
-	var email = document.getElementById('email').value;
-	var password = document.getElementById('password').value;
+/**
+ * This function takes the information in the input boxes and uses it to login.
+ * 
+ * Taken from Chris Casola's code.
+ */
+function doLogin (event) {
+	// get email
+	var email = document.getElementById('loginEmail').value;
+	// get password
+	var password = document.getElementById('loginPassword').value;
+	
+	// construct the data to POST to /api/login
 	var dataString = 'email=' + email + '&password=' + password;
 	$.ajax({
 	  type: 'POST',
@@ -23,13 +78,18 @@ function login (event) {
 	});
 }
 
+/**
+ * Handles the response from /api/login.
+ * 
+ * Taken from Chris Casola's code.
+ */
 function login_response(response) {
 	var result = eval('(' + response + ')');
 	if (result.success == true) {
 		localStorage['playerid'] = result.userid;
-		document.getElementById('mainContent').innerHTML="<p>Login successful!</p>";
+		document.getElementById('loginError').innerHTML="<p>Login successful!</p>";
 	}
 	else {
-		document.getElementById('mainContent').innerHTML="<p>Login failed!</p>";
+		document.getElementById('loginError').innerHTML="<p>Login failed!</p>";
 	}
 }

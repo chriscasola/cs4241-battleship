@@ -1,0 +1,24 @@
+#loginBox {
+	background: linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -o-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -moz-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -webkit-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -ms-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	position: absolute;
+	top: 50%;
+	margin-top: -10%;
+	left: 50%;
+	margin-left: -25%;
+	width: 50%;
+	height: 50%;
+	z-index: 11;
+	border-radius: 5px;
+}
+
+#loginBox h1 {
+	text-align: center;
+}
+
+#loginBox div {
+	 margin-left: 10px;
+}
