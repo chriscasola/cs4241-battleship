@@ -2,4 +2,6 @@
 *.pyc
 *.pyo
 .env
-*.log
+*.logpublic/scripts/login.0.js
+battle.log
+public/scripts/login.0.js
