@@ -6,7 +6,9 @@
  * @author Chris Page
  */
 
-LoginBoxHTML =	'   <h1>Login</h1>' +
+LoginBoxHTML =	'	<h1>Login</h1>' +
+				'	<a id="closeLoginBox" onclick="removeLoginOverlay()">X</a>' + 
+				'   </table>' +
 				'	<br />' + 
 				'	<div>' + 
 				'		<table>' + 
@@ -57,11 +59,39 @@ function removeLoginOverlay() {
 }
 
 /**
+ * Disables the login inputs.
+ */
+function disableInput() {
+	elLoginEmail = document.getElementById("loginEmail");
+	elLoginPassword = document.getElementById("loginPassword");
+	elLogin = document.getElementById("login");
+	
+	elLoginEmail.setAttribute("disabled", "disabled");
+	elLoginPassword.setAttribute("disabled", "disabled");
+	elLogin.setAttribute("disabled", "disabled");
+}
+
+/**
+ * Enables the login inputs.
+ */
+function enableInput() {
+	elLoginEmail = document.getElementById("loginEmail");
+	elLoginPassword = document.getElementById("loginPassword");
+	elLogin = document.getElementById("login");
+	
+	elLoginEmail.removeAttribute("disabled");
+	elLoginPassword.removeAttribute("disabled");
+	elLogin.removeAttribute("disabled");
+}
+
+/**
  * This function takes the information in the input boxes and uses it to login.
  * 
  * Taken from Chris Casola's code.
  */
 function doLogin (event) {
+	disableInput();
+	
 	// get email
 	var email = document.getElementById('loginEmail').value;
 	// get password
@@ -82,14 +112,18 @@ function doLogin (event) {
  * Handles the response from /api/login.
  * 
  * Taken from Chris Casola's code.
+ * 
+ * @param response The response from the jquery ajax.
  */
 function login_response(response) {
 	var result = eval('(' + response + ')');
 	if (result.success == true) {
 		sessionStorage['playerid'] = result.userid;
 		document.getElementById('loginError').innerHTML="<p>Login successful!</p>";
+		removeLoginOverlay();
 	}
 	else {
-		document.getElementById('loginError').innerHTML="<p>Login failed!</p>";
+		document.getElementById('loginError').innerHTML="<p>Login failed! Error recieved: " + result.error + "</p>";
+		enableInput();
 	}
 }

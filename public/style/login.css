@@ -22,3 +22,33 @@
 #loginBox div {
 	 margin-left: 10px;
 }
+
+#closeLoginBox {
+	position:absolute;
+	right: 0px;
+	top: 0px;
+	font-size: 200%;
+	font-family: 'Helvetica', 'Arial', 'Sans Serif';
+	padding-top: .6em;
+	padding-left: .6em;
+	padding-right: .6em;
+	margin: 0 0 0 0;
+	height: 35px;
+	/*float: left;*/
+	color: red;
+	padding-top: 0em;
+}
+
+#closeLoginBox:hover {	
+	background: linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -o-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -moz-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -webkit-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -ms-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	border-radius: 5px;
+}
+
+#loginError {
+	text-align: center;
+	color: red;
+}
