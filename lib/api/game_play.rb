@@ -152,19 +152,19 @@ end
 def receive_shot(json_req)
     the_shot = JSON.parse(json_req)
     
-    if (is_my_turn(the_shot) == false)
-    	return 'not your turn'
-    end
-
     if (verify_shot(the_shot) == false)
         return 'invalid'
     end
+    
+    if (is_my_turn(the_shot) == false)
+    	return 'not your turn'
+    end
  
-    #begin
+    begin
         is_hit!(the_shot)
-    #rescue
-    #    return 'ships_missing'
-    #end
+    rescue
+        return 'ships_missing'
+    end
     
     begin
     #store the shot in db
@@ -175,12 +175,31 @@ def receive_shot(json_req)
         query = query.gsub(/%%ypos%%/, the_shot["ypos"].to_s)
         query = query.gsub(/%%hit%%/, the_shot["hit"].to_s)
         conn.exec(query)
-        conn.finish()
     rescue
         conn.finish()
         return 'invalid'
     end
+    
+    check_win!(conn, the_shot)
+    
+    conn.finish()
     return the_shot.to_json
+end
+
+def check_win!(conn, the_shot)
+	query = "SELECT stype FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']} AND afloat=false;"
+	result = conn.exec(query)
+	if (result.ntuples() == 5)
+		the_shot['win'] = true
+		update_battle_status(the_shot['playerid'], the_shot['battleid'], conn)
+	end
+end
+
+def update_battle_status(playerid, battleid, conn)
+	status = 'p' + playerid + 'win';
+	query = "UPDATE battles SET status='#{status}' WHERE battleid=#{battleid}; "
+	query += "UPDATE battles SET enddate=now() WHERE battleid=#{battleid};"
+	conn.exec(query)
 end
 
 def is_my_turn(the_shot)
@@ -265,8 +284,8 @@ def send_shots(request)
 <<EOS
 SELECT moveid, battleid, playerid, xpos, ypos, hit
 FROM battle_moves
-WHERE moveid > #{state['last_shot']}
-AND battleid = #{state['battleid']};
+WHERE moveid>#{state['last_shot']}
+AND battleid=#{state['battleid']};
 EOS
 
     conn = connectToDB(ENV['SHARED_DATABASE_URL'])
@@ -278,8 +297,12 @@ EOS
     end
     if (result.ntuples() > 0)
         response = Array.new
+        response << {'message' => ''}
         result.each do |row|
             response << {'battleid' => row['battleid'], 'playerid' => row['playerid'], 'xpos' => row['xpos'], 'ypos' => row['ypos'], 'hit' => row['hit'], 'id' => row['moveid']}
+        end
+        if (check_win(conn, state['battleid'], state['playerid']))
+        	response[0]['message'] = 'lost'
         end
     	conn.finish()
     	return {'type' => 'shot', 'content' => response}.to_json
@@ -288,6 +311,16 @@ EOS
     	conn.finish()
     	return response
     end
+end
+
+def check_win(conn, battleid, playerid)
+	query = "SELECT stype FROM battle_positions WHERE battleid=#{battleid} AND playerid=#{playerid} AND afloat=false;"
+	result = conn.exec(query)
+	if (result.ntuples() == 5)
+		return true
+	else
+		return false
+	end
 end
 
 def verify_shot(the_shot)
