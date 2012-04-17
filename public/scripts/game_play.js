@@ -9,7 +9,7 @@ function placeShip(event) {
 	var clickPos = getClickPosition(event, event.target);
 	var shipType = getShipType();
 	var orientation = getShipOrientation();
-	var the_ship = new Ship(localStorage['battleid'], localStorage['playerid'], clickPos.x, clickPos.y, shipType, orientation, true);
+	var the_ship = new Ship(sessionStorage['battleid'], sessionStorage['playerid'], clickPos.x, clickPos.y, shipType, orientation, true);
 	the_ship.mouseToCell();
 	the_ship.send();
 }
@@ -39,7 +39,7 @@ function canvasClick(event) {
 	var clickPos = getClickPosition(event, event.target);
 
 	// construct a Shot representing this click
-	var thisShot = new Shot(localStorage['battleid'], localStorage['playerid'], clickPos.x, clickPos.y, false, 0);
+	var thisShot = new Shot(sessionStorage['battleid'], sessionStorage['playerid'], clickPos.x, clickPos.y, false, 0);
 	thisShot.mouseToCell();
 
 	// send the shot to the server and draw the shot upon response
@@ -51,8 +51,8 @@ function getShips() {
 		type : 'POST',
 		url : '/api/get_ships',
 		data : JSON.stringify({
-			battleid : localStorage['battleid'],
-			playerid : localStorage['playerid']
+			battleid : sessionStorage['battleid'],
+			playerid : sessionStorage['playerid']
 		}),
 		success : receiveShips,
 		dataType : 'text'
@@ -79,7 +79,8 @@ function listenForUpdates() {
 		url : '/api/check_shot',
 		data : JSON.stringify({
 			last_shot : last_shot_received,
-			battleid : localStorage['battleid']
+			battleid : sessionStorage['battleid'],
+			playerid : sessionStorage['playerid']
 		}),
 		success : receiveUpdate,
 		dataType : 'text'
@@ -96,6 +97,9 @@ function receiveUpdate(response) {
 
 		case 'shot':
 			receiveOtherShot(resp_obj.content);
+			if (resp_obj.content[0].message == 'lost') {
+				alert("You lost the game!");
+			}
 			break;
 	}
 	setTimeout(listenForUpdates, 5000);
@@ -103,11 +107,11 @@ function receiveUpdate(response) {
 
 function receiveOtherShot(shot_list) {
 	var i;
-	for( i = 0; i < shot_list.length; i++) {
+	for( i = 1; i < shot_list.length; i++) {
 		var shot_obj = shot_list[i];
 		var the_shot = new Shot(parseInt(shot_obj.battleid), parseInt(shot_obj.playerid), parseInt(shot_obj.xpos), parseInt(shot_obj.ypos), shot_obj.hit, parseInt(shot_obj.id));
 		the_shot.hit = (the_shot.hit == 't') ? true : false;
-		if(the_shot.playerid == localStorage['playerid']) {
+		if(the_shot.playerid == sessionStorage['playerid']) {
 			the_shot.draw(rightCanvas);
 		} else {
 			the_shot.draw(leftCanvas);

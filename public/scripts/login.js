@@ -86,7 +86,7 @@ function doLogin (event) {
 function login_response(response) {
 	var result = eval('(' + response + ')');
 	if (result.success == true) {
-		localStorage['playerid'] = result.userid;
+		sessionStorage['playerid'] = result.userid;
 		document.getElementById('loginError').innerHTML="<p>Login successful!</p>";
 	}
 	else {

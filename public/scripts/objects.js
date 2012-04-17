@@ -252,5 +252,9 @@ function receiveShot(response) {
 		if (shot_obj.sunk == true) {
 			alert ('Congratulations! You sunk their ship.');
 		}
+		if (shot_obj.win == true) {
+			alert ('Congratulations! You won the game.');
+			// TODO something to move both players away from the game page
+		}
 	}
 }
