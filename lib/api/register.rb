@@ -30,8 +30,7 @@ EOS
 	# SQL statement for inserting a new record into the users table
     @@SQL_InsertUserRecord =
 <<EOS
-INSERT INTO users (name, email, password)
-VALUES ('%%name%%', %%email%%, %%password%%);
+INSERT INTO users VALUES (default, '%%name%%', '%%email%%', '%%password%%');
 EOS
 
 	# JSON returned if registration was successful
@@ -74,7 +73,9 @@ EOS
                     # If the name is not already in the database
                     if (results.ntuples == 0)
                         # Insert user record
-                        query = @@SQL_InsertUserRecord.gsub(/%%name%%/, name).gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password))
+                        query = @@SQL_InsertUserRecord.gsub(/%%name%%/, name).gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password1))
+                        File.open("local_filename.log", 'w') {|f| f.write(query) }
+                        
                         results = conn.exec(query)
 
                         # Record successfully inserted
