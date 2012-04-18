@@ -46,7 +46,6 @@ function showLoginOverlay() {
 	var loginBox = document.createElement("div");
 	loginBox.setAttribute("id","loginBox");
 	loginBox.innerHTML = LoginBoxHTML;
-	loginBox.innerHTML = LoginBoxHTML;
 	document.body.appendChild(loginBox);
 }
 
@@ -61,10 +60,10 @@ function removeLoginOverlay() {
 /**
  * Disables the login inputs.
  */
-function disableInput() {
-	elLoginEmail = document.getElementById("loginEmail");
-	elLoginPassword = document.getElementById("loginPassword");
-	elLogin = document.getElementById("login");
+function disableLoginInput() {
+	var elLoginEmail = document.getElementById("loginEmail");
+	var elLoginPassword = document.getElementById("loginPassword");
+	var elLogin = document.getElementById("login");
 	
 	elLoginEmail.setAttribute("disabled", "disabled");
 	elLoginPassword.setAttribute("disabled", "disabled");
@@ -74,10 +73,10 @@ function disableInput() {
 /**
  * Enables the login inputs.
  */
-function enableInput() {
-	elLoginEmail = document.getElementById("loginEmail");
-	elLoginPassword = document.getElementById("loginPassword");
-	elLogin = document.getElementById("login");
+function enableLoginInput() {
+	var elLoginEmail = document.getElementById("loginEmail");
+	var elLoginPassword = document.getElementById("loginPassword");
+	var elLogin = document.getElementById("login");
 	
 	elLoginEmail.removeAttribute("disabled");
 	elLoginPassword.removeAttribute("disabled");
@@ -90,7 +89,7 @@ function enableInput() {
  * Taken from Chris Casola's code.
  */
 function doLogin (event) {
-	disableInput();
+	disableLoginInput();
 	
 	// get email
 	var email = document.getElementById('loginEmail').value;
@@ -124,6 +123,6 @@ function login_response(response) {
 	}
 	else {
 		document.getElementById('loginError').innerHTML="<p>Login failed! Error recieved: " + result.error + "</p>";
-		enableInput();
+		enableLoginInput();
 	}
 }

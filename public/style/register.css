@@ -1,0 +1,54 @@
+#registerBox {
+	background: linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -o-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -moz-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -webkit-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -ms-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	position: absolute;
+	top: 50%;
+	margin-top: -10%;
+	left: 50%;
+	margin-left: -25%;
+	width: 50%;
+	height: 50%;
+	z-index: 11;
+	border-radius: 5px;
+}
+
+#registerBox h1 {
+	text-align: center;
+}
+
+#registerBox div {
+	 margin-left: 10px;
+}
+
+#closeRegisterBox {
+	position:absolute;
+	right: 0px;
+	top: 0px;
+	font-size: 200%;
+	font-family: 'Helvetica', 'Arial', 'Sans Serif';
+	padding-top: .6em;
+	padding-left: .6em;
+	padding-right: .6em;
+	margin: 0 0 0 0;
+	height: 35px;
+	/*float: left;*/
+	color: red;
+	padding-top: 0em;
+}
+
+#closeRegisterBox:hover {	
+	background: linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -o-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -moz-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -webkit-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	background: -ms-linear-gradient(bottom, rgb(230,230,230) 43%, rgb(204,204,204) 72%);
+	border-radius: 5px;
+}
+
+#registerError {
+	text-align: center;
+	color: red;
+}

@@ -11,7 +11,7 @@ var sectionNames = [
 
 var extraButtons = [
 	{title: "Login", href: null, onclick: "showLoginOverlay()"},
-	{title: "Register", href: "/index.html", onclick: null},
+	{title: "Register", href: null, onclick: "showRegisterOverlay()"},
 ];
 
 function generateTopMenu() {
