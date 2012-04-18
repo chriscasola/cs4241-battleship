@@ -117,6 +117,38 @@ nav li a:link, nav li a:visited {
 	font-family: 'Arial', 'Sans Serif';
 }
 
+
+#mainContent table {
+	border-collapse: collapse;
+	margin-left: auto;
+	margin-right: auto;
+	width: 75%;
+}
+
+
+#mainContent table, th, td {
+	border: 1px solid rgb(173,173,173);;
+}
+
+#mainContent th, td {
+	padding: 5px 5px 5px 5px;
+}
+
+#mainContent th {
+	background-color: rgb(173, 173, 173);
+	color: rgb(22,41,67);
+}
+
+#mainContent tr:hover {
+	/*background-color: rgb(173, 173, 173);*/
+	color: rgb(22,41,67);
+	background: linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -o-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -moz-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -webkit-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+	background: -ms-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
+}
+
 #orientationSelection {
 	margin-top: 25px;
 	margin-bottom: 10px;
