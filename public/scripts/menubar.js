@@ -1,12 +1,18 @@
 /**
- * TODO This comment.
+ * Deals with generating and regenerating the menu bar.
  * 
  * @author Chris Casola
  * @author Chris Page
  */
 
-var CurrentPage;
+/**
+ * Stores what the current page is.
+ */
+var MenuCurrentPage;
 
+/**
+ * The html for the menu bar.
+ */
 var menuBarHTML =	'<nav>' + 
 					'	<ul id="menuBarList">' + 
 					'	</ul>' + 
@@ -27,7 +33,10 @@ var extraButtons = [
 	{title: "Register", href: null, onclick: "showRegisterOverlay()"}
 ];
 
-function fillTopMenuWithSections(currentPage) {
+/**
+ * Adds the list items that appear on the left side of the menu.
+ */
+function fillTopMenuWithSections() {
 	var elMenuBarList = document.getElementById("menuBarList");
 	var i;
 	
@@ -45,7 +54,7 @@ function fillTopMenuWithSections(currentPage) {
 			
 			newSectionLi.appendChild(newSectionLiA);
 			
-			if (currentPage == sectionNames[i].title) {
+			if (MenuCurrentPage == sectionNames[i].title) {
 				newSectionLi.setAttribute("class","activePage");
 			}
 			
@@ -54,6 +63,10 @@ function fillTopMenuWithSections(currentPage) {
 	}
 }
 
+/**
+ * Decides whether or not the username or the login and register buttons 
+ * should be displayed and then adds them to the menu bar.
+ */
 function fillTopMenuRightSide() {
 	if (userIsLoggedIn()) {
 		fillTopMenuRightSideUserStuff();
@@ -63,10 +76,16 @@ function fillTopMenuRightSide() {
 	}
 }
 
+/**
+ * Adds the username and a logout link to the right side of the menu.
+ */
 function fillTopMenuRightSideUserStuff() {
-	
+	// TODO This function.
 }
 
+/**
+ * Adds the list items that appear on the right side of the menu.
+ */
 function fillTopMenuRightSideButtons() {
 	var elMenuBarList = document.getElementById("menuBarList");
 	var i;
@@ -95,50 +114,43 @@ function fillTopMenuRightSideButtons() {
 	}
 }
 
-function generateTopMenu(currentPage) {
-	CurrentPage = currentPage;
+/**
+ * Generates the top menu.
+ */
+function generateTopMenu() {
 	document.write(menuBarHTML);
 	
-	fillTopMenuWithSections(currentPage);
+	fillTopMenuWithSections();
 	fillTopMenuRightSide();
 }
 
-function refreshTopMenu() {
+/**
+ * Regenerates the contents of the unordered list in the nav element.
+ */
+function regenerateTopMenu() {
 	var elMenuBarList = document.getElementById("menuBarList");
 	
-	//elMenuBarList = 
+	elMenuBarList.innerHTML = "";
+	
+	fillTopMenuWithSections();
+	fillTopMenuRightSide();
 }
 
-/*function generateTopMenu() {
-	var menuHTML = '<nav><ul>';
-	var i;
-	var currPage = getCurrPage();
-	
-	for (i=0; i<sectionNames.length; i++) {
-		menuHTML += '<li ';
-		if (currPage == sectionNames[i].title) {
-			menuHTML += 'class="activePage"';
-		}
-		menuHTML += '><a href="' + sectionNames[i].href + '"><p>' + sectionNames[i].title + '</p></a></li>';
-	}
-	
-	for (i=0; i<extraButtons.length; i++) {
-		menuHTML += '<li class="rightSide">';
-		menuHTML += '<a';
-		if (extraButtons[i].href != null) {
-			menuHTML += ' href="' + extraButtons[i].href + '"';
-		}
-		if (extraButtons[i].onclick != null) {
-			menuHTML += ' onclick="' + extraButtons[i].onclick + '"';
-		}
-		menuHTML += '><p>' + extraButtons[i].title + '</p></a></li>';
-	}
-	menuHTML += '</ul></nav>'
-	document.write(menuHTML);
-}*/
+/**
+ * Sets the value of the MenuCurrentPage variable. This variable is used to 
+ * highlight the correct menu item when it is generated.
+ * 
+ * @param currentPage
+ */
+function setMenuCurrentPage(currentPage) {
+	MenuCurrentPage = currentPage;
+}
 
+/**
+ * Checks if the user is logged in.
+ */
 function userIsLoggedIn() {
-	return true;
+	return !(sessionStorage['playerid'] == undefined);
 }
 
 function getCurrPage() {
