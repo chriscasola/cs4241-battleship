@@ -18,8 +18,10 @@ Ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' =
 def receive_ship(json_req)
     the_ship = JSON.parse(json_req)
     
-    if (!(the_ship['playerid'] = dbTools.new.getPlayerId()))
+    if (dbTools.new.getPlayerId() == false)
     	return 'not logged in'
+    else
+    	the_ship['playerid'] = dbTools.new.getPlayerId()
     end
 
     if (check_bounds(the_ship) == false)
@@ -161,6 +163,10 @@ end
 
 def receive_shot(json_req)
     the_shot = JSON.parse(json_req)
+    
+    if (dbTools.new.getPlayerId() == false)
+    	return 'not logged in'
+    end
     
     if (verify_shot(the_shot) == false)
         return 'invalid'
