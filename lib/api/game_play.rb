@@ -1,3 +1,9 @@
+#
+# File to handle the playing of a battle ship game
+#
+# Author: Chris Casola, Chris Page
+#
+
 require 'api/dbmgr'
 require 'json'
 

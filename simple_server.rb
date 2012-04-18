@@ -18,6 +18,7 @@ require 'api/dbmgr'
 require 'api/login'
 require 'api/register'
 require 'api/game_play'
+require 'api/battles'
 require 'json'
 
 set :static, true
@@ -51,6 +52,10 @@ end
 
 post '/api/get_ships' do
     send_ships(request.body.read)
+end
+
+post '/api/my_battles' do
+	get_battles(request.body.read)
 end
 
 get '/db_manager' do
