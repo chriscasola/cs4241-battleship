@@ -7,7 +7,7 @@
 require 'tools/dbTools'
 require 'json'
 
-def get_battles(playerid)
+def get_battles()
 	query = "SELECT battleid, p1id AS playerid, startdate, enddate FROM battles WHERE p1id<>#{playerid};"
 	conn = DBTools.new.connectToDB()
 	result = conn.exec(query)

@@ -20,4 +20,20 @@ class DBTools
     	dbPath =~ %r|^postgres://(\S*):(\S*)@(\S*)/(\S*)$|
     	conn = PG::Connection.new( :host => $3, :dbname => $1, :user => $4, :password => $2)
 	end
+	
+	
+	# Get the playerid associated with this session
+	def getPlayerId()
+		query = "SELECT userid FROM users_online WHERE sessionid='#{session['sessionid']};"
+		conn = connectToDB()
+		result = conn.exec(query)
+		begin
+			retVal = result[0]['userid']
+			conn.finish()
+			return retVal
+		rescue
+			conn.finish()
+			return false
+		end
+	end
 end

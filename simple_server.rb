@@ -54,8 +54,8 @@ post '/api/get_ships' do
     send_ships(request.body.read)
 end
 
-post '/api/my_battles' do
-	get_battles(request.body.read)
+get '/api/my_battles' do
+	get_battles()
 end
 
 get '/db_manager' do

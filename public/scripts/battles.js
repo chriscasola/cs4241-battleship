@@ -6,33 +6,36 @@
  *
  */
 
-window.onload = function() {
-	document.getElementById('mainContent').innerHTML = "<h1>My Battles</h1>";
-	
+window.onload = function() {	
 	if (sessionStorage['playerid'] == undefined) {
-		document.getElementById('mainContent').innerHTML += "<p>You need to login to see your battles.</p>";
+		var mainContent = document.getElementById('mainContent');
+		var newElement = document.createElement("p");
+		newElement.innerHTML = "You need to login to see your battles.";
+		mainContent.appendChild(newElement);
 	} 
 	else {
 		$.ajax({
-			type : 'POST',
+			type : 'GET',
 			url : '/api/my_battles',
-			data : sessionStorage['playerid'],
 			success : displayBattles,
 			error : myBattlesReqFail,
-			dataType : 'text'
 		});
 	}
 }
 
 function displayBattles(response) {
 	response = eval('(' + response + ')');
-	mainContent = document.getElementById('mainContent');
-	mainContent.innerHTML += "<table><thead><tr><th>Opponent</th><th>Start Date</th><th>End Date</th></tr></thead>"
+	var mainContent = document.getElementById('mainContent');
+	var newTable = document.createElement("table");
+	newTable.innerHTML = "<thead><tr><th>Opponent</th><th>Start Date</th><th>End Date</th></tr></thead>";
+	
 	var i;
 	for (i=0; i<response.length; i++) {
-		mainContent.innerHTML += "<tr><td>" + response[i].playerid + "</td><td>" + response[i].startdate + "</td><td>" + response[i].enddate + "</td></tr>";
+		var newRow = document.createElement("tr");
+		newRow.innerHTML = "<td>" + response[i].playerid + "</td><td>" + response[i].startdate + "</td><td>" + response[i].enddate + "</td>";
+		newTable.appendChild(newRow);
 	}
-	mainContent.innerHTML += "</table>";
+	mainContent.appendChild(newTable);
 }
 
 function myBattlesReqFail(error) {
