@@ -81,6 +81,28 @@ function fillTopMenuRightSide() {
  */
 function fillTopMenuRightSideUserStuff() {
 	// TODO This function.
+	var elMenuBarList = document.getElementById("menuBarList");
+	
+	var elUsernameLi = document.createElement("li");
+	var elUsernameLiP = document.createElement("p");
+	var elLogoutLi = document.createElement("li");
+	var elLogoutLiA = document.createElement("a");
+	
+	elUsernameLiP.innerHTML = "Your username here";
+	
+	elUsernameLi.appendChild(elUsernameLiP);
+	elUsernameLi.setAttribute("id", "menuUsername");
+	elUsernameLi.setAttribute("class", "rightSide");
+	
+	elLogoutLiA.innerHTML = "<p>Logout</p>";
+	elLogoutLiA.setAttribute("onclick", "doLogout()");
+	
+	elLogoutLi.appendChild(elLogoutLiA);
+	elLogoutLi.setAttribute("id", "menuLogout");
+	elLogoutLi.setAttribute("class", "rightSide");
+	
+	elMenuBarList.appendChild(elLogoutLi);
+	elMenuBarList.appendChild(elUsernameLi);
 }
 
 /**
