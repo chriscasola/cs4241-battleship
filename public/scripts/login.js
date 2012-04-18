@@ -118,8 +118,10 @@ function login_response(response) {
 	var result = eval('(' + response + ')');
 	if (result.success == true) {
 		sessionStorage['playerid'] = result.userid;
+		sessionStorage['playername'] = result.name;
 		document.getElementById('loginError').innerHTML="<p>Login successful!</p>";
 		removeLoginOverlay();
+		regenerateTopMenu();
 	}
 	else {
 		document.getElementById('loginError').innerHTML="<p>Login failed! Error recieved: " + result.error + "</p>";

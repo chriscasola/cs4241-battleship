@@ -88,7 +88,7 @@ function fillTopMenuRightSideUserStuff() {
 	var elLogoutLi = document.createElement("li");
 	var elLogoutLiA = document.createElement("a");
 	
-	elUsernameLiP.innerHTML = "Your username here";
+	elUsernameLiP.innerHTML = sessionStorage['playername'];
 	
 	elUsernameLi.appendChild(elUsernameLiP);
 	elUsernameLi.setAttribute("id", "menuUsername");
