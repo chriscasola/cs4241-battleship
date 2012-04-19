@@ -14,6 +14,9 @@ window.onload = function() {
 		mainContent.appendChild(newElement);
 	} 
 	else {
+		document.getElementById('createBattle').style.cursor="pointer";
+		document.getElementById('createBattle').addEventListener("click", showCreateBattleForm, false);
+		
 		$.ajax({
 			type : 'GET',
 			url : '/api/my_battles',
@@ -42,6 +45,13 @@ function displayBattles(response) {
 		newRow.style.cursor="pointer";
 	}
 	mainContent.appendChild(newTable);
+}
+
+function showCreateBattleForm(event) {
+	var battleForm = document.getElementById('createBattleForm');
+	battleForm.innerHTML = "<p>Battle with: <input type='text' id='oppName' /><input type='button' value='Start battle' id='startBattle' /></p>";
+	battleForm.innerHTML += "<p><input type='button' value='Find an online player' name='findOnline' /></p>";
+	document.getElementById('createBattle').setAttribute('hidden', 'true');
 }
 
 function onClickBattleRow(event) {

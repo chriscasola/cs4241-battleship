@@ -1,7 +1,7 @@
 #
 # Returns the list of battles a user is participating in
 #
-# Author: Chris Casola, Chris Page
+# Author: Chris Casola
 #
 
 require 'tools/dbTools'
