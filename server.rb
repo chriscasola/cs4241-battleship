@@ -17,6 +17,7 @@ require 'sinatra'
 require 'api/dbmgr'
 require 'api/LoginApi'
 require 'api/RegisterApi'
+require 'api/LeaderboardApi'
 require 'api/game_play'
 require 'api/battles'
 require 'json'
@@ -26,6 +27,7 @@ set :public, File.dirname(__FILE__) + '/public'
 
 use LoginApi
 use RegisterApi
+use LeaderboardApi
 
 get '/' do
     redirect 'http://' + request.host_with_port() + '/index.html'

@@ -7,7 +7,6 @@
 
 require 'sinatra/base'
 require 'digest/sha2'
-require 'iconv'
 require 'json'
 require 'tools/hashPassword'
 require 'tools/inputValidator'
@@ -71,9 +70,7 @@ EOS
             # Get userid based on credentials. There will be no results if the credentials are wrong.
             # TODO Escape the email.
 
-            query = @@SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password))
-            #ic = Iconv.new('UNICODE//IGNORE', 'UTF-8')
-            #query = ic.iconv(query)
+            query = @@SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, escape(email)).gsub(/%%password%%/, hashPassword(password))
             results = conn.exec(query)
 
             # If the credentials are wrong (0 results)
