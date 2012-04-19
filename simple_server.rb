@@ -15,8 +15,8 @@ $: << File.expand_path(File.dirname(__FILE__) + "/lib")
 
 require 'sinatra'
 require 'api/dbmgr'
-require 'api/login'
-require 'api/register'
+require 'api/LoginApi'
+require 'api/RegisterApi'
 require 'api/game_play'
 require 'api/battles'
 require 'json'
