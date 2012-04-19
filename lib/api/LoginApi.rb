@@ -7,7 +7,6 @@
 
 require 'sinatra/base'
 require 'digest/sha2'
-require 'iconv'
 require 'json'
 require 'tools/hashPassword'
 require 'tools/inputValidator'
@@ -72,8 +71,6 @@ EOS
             # TODO Escape the email.
 
             query = @@SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password))
-            #ic = Iconv.new('UNICODE//IGNORE', 'UTF-8')
-            #query = ic.iconv(query)
             results = conn.exec(query)
 
             # If the credentials are wrong (0 results)

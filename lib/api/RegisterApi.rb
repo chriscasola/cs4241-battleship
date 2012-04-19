@@ -74,7 +74,6 @@ EOS
                     if (results.ntuples == 0)
                         # Insert user record
                         query = @@SQL_InsertUserRecord.gsub(/%%name%%/, name).gsub(/%%email%%/, email).gsub(/%%password%%/, hashPassword(password1))
-                        File.open("local_filename.log", 'w') {|f| f.write(query) }
                         
                         results = conn.exec(query)
 
