@@ -33,7 +33,7 @@ end
 def processBattlesRow(playerid, row, response)
 	sdate = /\A(\d\d\d\d)-(\d\d)-(\d\d)\s*(\d*):(\d*)/.match(row['startdate'])
 	status = /\A\S(\S)(\S*)/.match(row['status'])
-	if (status[1] != playerid)
+	if (status[1] == playerid)
 		if (status[2] == 'win')
 			status = 'You won'
 		else
