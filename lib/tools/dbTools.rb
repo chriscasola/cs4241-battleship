@@ -23,11 +23,11 @@ class DBTools
 	
 	
 	# Get the playerid associated with this session
-	def getPlayerId()
-		query = "SELECT userid FROM users_online WHERE sessionid='#{session['sessionid']};"
-		conn = connectToDB()
-		result = conn.exec(query)
+	def getPlayerId(sessionid)
 		begin
+			query = "SELECT userid FROM users_online WHERE sessionid='#{sessionid}';"
+			conn = connectToDB()
+			result = conn.exec(query)
 			retVal = result[0]['userid']
 			conn.finish()
 			return retVal

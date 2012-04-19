@@ -60,7 +60,10 @@ function getShips() {
 }
 
 function receiveShips(response) {
-	if(response != 'none') {
+	if (response == 'not logged in') {
+		document.getElementById('mainContent').innerHTML = "You are not logged in!";
+	}
+	else if(response != 'none') {
 		ship_list = eval('(' + response + ')');
 
 		var i;
@@ -88,6 +91,10 @@ function listenForUpdates() {
 }
 
 function receiveUpdate(response) {
+	if (response == 'not logged in') {
+		document.getElementById('mainContent').innerHTML = "You are not logged in!";
+		return;
+	}
 	resp_obj = eval('(' + response + ')');
 
 	switch (resp_obj.type) {

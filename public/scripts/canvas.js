@@ -20,9 +20,6 @@ window.onload = function () {
 	// Add event listener for click events on the canvas
 	rightCanvas.addEventListener("mouseup", canvasClick, false);
 	
-	// Set battle information
-	sessionStorage['battleid'] = "1";
-	
 	// Retrieve ships already placed
 	getShips();
 	

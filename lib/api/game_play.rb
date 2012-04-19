@@ -5,6 +5,7 @@
 #
 
 require 'api/dbmgr'
+require 'tools/dbTools'
 require 'json'
 
 SQL_InsertBattleMove =
@@ -18,10 +19,10 @@ Ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' =
 def receive_ship(json_req)
     the_ship = JSON.parse(json_req)
     
-    if (dbTools.new.getPlayerId() == false)
+    if (DBTools.new.getPlayerId(session['sessionid']) == false)
     	return 'not logged in'
     else
-    	the_ship['playerid'] = dbTools.new.getPlayerId()
+    	the_ship['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
     end
 
     if (check_bounds(the_ship) == false)
@@ -137,6 +138,13 @@ end
 
 def send_ships(request)
     state = JSON.parse(request)
+    
+    if (DBTools.new.getPlayerId(session['sessionid']) == false)
+    	return 'not logged in'
+    else
+    	state['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
+    end
+    
     battleid = state['battleid']
     playerid = state['playerid']
     query = "SELECT * FROM battle_positions WHERE battleid=#{battleid} AND playerid=#{playerid};"
@@ -164,8 +172,10 @@ end
 def receive_shot(json_req)
     the_shot = JSON.parse(json_req)
     
-    if (dbTools.new.getPlayerId() == false)
+    if (DBTools.new.getPlayerId(session['sessionid']) == false)
     	return 'not logged in'
+    else
+    	the_shot['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
     end
     
     if (verify_shot(the_shot) == false)
@@ -296,6 +306,13 @@ end
 
 def send_shots(request)
     state = JSON.parse(request)
+    
+    if (DBTools.new.getPlayerId(session['sessionid']) == false)
+    	return 'not logged in'
+    else
+    	state['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
+    end
+    
     query =
 <<EOS
 SELECT moveid, battleid, playerid, xpos, ypos, hit
