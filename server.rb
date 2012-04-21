@@ -60,6 +60,10 @@ get '/api/my_battles' do
 	get_battles()
 end
 
+post '/api/create_battle' do
+	create_battle(request.body.read)
+end
+
 get '/db_manager' do
     runDBShell(ENV['SHARED_DATABASE_URL'])
 end

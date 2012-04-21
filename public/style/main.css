@@ -106,8 +106,8 @@ nav li a:link, nav li a:visited {
 	float: right;
 }
 
-#menuUsername {
-	margin: 4px 0 0 0;
+#userNameLabel {
+	padding-top: .25em;
 	font-size: .7em;
 }
 

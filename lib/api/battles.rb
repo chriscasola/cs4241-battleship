@@ -8,11 +8,12 @@ require 'tools/dbTools'
 require 'json'
 
 def get_battles()
-	if (DBTools.new.getPlayerId(session['sessionid']) == false)
-		return 'not logged in'
-	else
-		playerid = DBTools.new.getPlayerId(session['sessionid']);
-	end
+	#if (DBTools.new.getPlayerId(session['sessionid']) == false)
+	#	return 'not logged in'
+	#else
+	#	playerid = DBTools.new.getPlayerId(session['sessionid']);
+	#end
+	playerid = 1
 	
 	query = "SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id<>#{playerid} AND p1id=userid;"
 	conn = DBTools.new.connectToDB()
@@ -28,6 +29,27 @@ def get_battles()
 		processBattlesRow(playerid, row, response)
 	end
 	response.to_json
+end
+
+def create_battle(opponentName)
+	#if (DBTools.new.getPlayerId(session['sessionid']) == false)
+	#	return 'not logged in'
+	#else
+	#	playerid = DBTools.new.getPlayerId(session['sessionid']);
+	#end
+	playerid = 1	
+	
+	begin
+		conn = DBTools.new.connectToDB()
+		opponentName = conn.escape(opponentName)
+		query = "INSERT INTO battles VALUES (default, #{playerid}, (SELECT userid FROM users WHERE name='#{opponentName}'), default, default, default, default);"
+		conn.exec(query)
+	rescue
+		conn.finish()
+		return 'invalid'
+	end
+	conn.finish()
+	return 'success'
 end
 
 def processBattlesRow(playerid, row, response)

@@ -88,6 +88,7 @@ function fillTopMenuRightSideUserStuff() {
 	var elLogoutLi = document.createElement("li");
 	var elLogoutLiA = document.createElement("a");
 	
+	elUsernameLiP.setAttribute('id', 'userNameLabel');
 	elUsernameLiP.innerHTML = sessionStorage['playername'];
 	
 	elUsernameLi.appendChild(elUsernameLiP);
