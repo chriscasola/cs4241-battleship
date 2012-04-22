@@ -68,9 +68,7 @@ EOS
             conn = DBTools.new.connectToDB()
 
             # Get userid based on credentials. There will be no results if the credentials are wrong.
-            # TODO Escape the email.
-
-            query = @@SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, escape(email)).gsub(/%%password%%/, hashPassword(password))
+            query = @@SQL_SelectUserIdViaCredentials.gsub(/%%email%%/, conn.escape_string(email)).gsub(/%%password%%/, hashPassword(password))
             results = conn.exec(query)
 
             # If the credentials are wrong (0 results)

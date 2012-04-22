@@ -59,7 +59,7 @@ EOS
                 conn = DBTools.new.connectToDB()
 
                 # Check if email is already in the database
-                query = @@SQL_SelectEmailFromUsers.gsub(/%%email%%/, escape(email))
+                query = @@SQL_SelectEmailFromUsers.gsub(/%%email%%/, conn.escape_string(email))
                 results = conn.exec(query)
 
                 # If the email is not already in the database
@@ -67,13 +67,13 @@ EOS
                     results.clear()
 
                     # Check if name is already in the database
-                    query = @@SQL_SelectNameFromUsers.gsub(/%%name%%/, escape(name))
+                    query = @@SQL_SelectNameFromUsers.gsub(/%%name%%/, conn.escape_string(name))
                     results = conn.exec(query)
 
                     # If the name is not already in the database
                     if (results.ntuples == 0)
                         # Insert user record
-                        query = @@SQL_InsertUserRecord.gsub(/%%name%%/, escape(name)).gsub(/%%email%%/, escape(email)).gsub(/%%password%%/, hashPassword(password1))
+                        query = @@SQL_InsertUserRecord.gsub(/%%name%%/, conn.escape_string(name)).gsub(/%%email%%/, conn.escape_string(email)).gsub(/%%password%%/, hashPassword(password1))
                         
                         results = conn.exec(query)
 
