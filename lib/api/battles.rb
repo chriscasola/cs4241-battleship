@@ -8,14 +8,14 @@ require 'tools/dbTools'
 require 'json'
 
 def get_battles()
-	#if (DBTools.new.getPlayerId(session['sessionid']) == false)
-	#	return 'not logged in'
-	#else
-	#	playerid = DBTools.new.getPlayerId(session['sessionid']);
-	#end
-	playerid = 1
-	
-	query = "SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id<>#{playerid} AND p1id=userid;"
+	if (DBTools.new.getPlayerId(session['sessionid']) == false)
+		return 'not logged in'
+	else
+		playerid = DBTools.new.getPlayerId(session['sessionid']);
+	end
+	query = "(SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id=#{playerid} and p2id=userid) "
+	query += "UNION "
+	query += "(SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id=userid and p2id=#{playerid});"
 	conn = DBTools.new.connectToDB()
 	result = conn.exec(query)
 	response = Array.new
@@ -23,11 +23,6 @@ def get_battles()
 		processBattlesRow(playerid, row, response)
 	end
 	
-	query = "SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p2id<>#{playerid} AND p2id=userid;"
-	result = conn.exec(query)
-	result.each do |row|
-		processBattlesRow(playerid, row, response)
-	end
 	response.to_json
 end
 
