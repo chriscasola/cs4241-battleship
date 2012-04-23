@@ -14,11 +14,12 @@
 $: << File.expand_path(File.dirname(__FILE__) + "/lib")
 
 require 'sinatra'
-require 'api/dbmgr'
+#require 'api/dbmgr'
 require 'api/LoginApi'
 require 'api/RegisterApi'
 require 'api/LeaderboardApi'
 require 'api/GamePlayApi'
+require 'api/DBShell'
 #require 'api/game_play'
 require 'api/battles'
 require 'api/battleMatcher'
@@ -31,6 +32,7 @@ use LoginApi
 use RegisterApi
 use LeaderboardApi
 use GamePlayApi
+use DBShell
 
 get '/' do
     redirect 'http://' + request.host_with_port() + '/index.html'
@@ -75,13 +77,13 @@ get '/api/find_match' do
 	find_match()
 end
 
-get '/db_manager' do
-    runDBShell(ENV['SHARED_DATABASE_URL'])
-end
+#get '/db_manager' do
+#    runDBShell(ENV['SHARED_DATABASE_URL'])
+#end
 
-post '/db_manager' do
-    runDBShell(ENV['SHARED_DATABASE_URL'], params)
-end
+#post '/db_manager' do
+#    runDBShell(ENV['SHARED_DATABASE_URL'], params)
+#end
 
 get '*' do
     "Path: " + request.fullpath()
