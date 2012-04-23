@@ -8,7 +8,6 @@
 =end
 
 require 'sinatra/base'
-require 'api/dbmgr'
 require 'tools/dbTools'
 require 'json'
 
