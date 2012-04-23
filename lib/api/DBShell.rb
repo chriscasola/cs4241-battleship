@@ -8,6 +8,7 @@
 =end
 
 require 'pg'
+require 'tools/dbTools'
 
 # This class provides a db shell.
 class DBShell < Sinatra::Base
@@ -42,7 +43,7 @@ class DBShell < Sinatra::Base
   </html>
 EOS
 	    else
-	        conn = connectToDB(dbPath)
+	        conn = DBTools.new.connectToDB()
 	        results = conn.exec(params[:sqlCode])
 	        strOut = ''
 	        results.each do |row|
