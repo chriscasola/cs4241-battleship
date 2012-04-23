@@ -6,6 +6,8 @@
  *
  */
 
+var mybattles = {};
+
 window.onload = function() {	
 	if (sessionStorage['playerid'] == undefined) {
 		var mainContent = document.getElementById('mainContent');
@@ -15,8 +17,6 @@ window.onload = function() {
 	} 
 	else {
 		initPage();
-		document.getElementById('createBattle').addEventListener("click", showCreateBattleForm, false);
-		
 		$.ajax({
 			type : 'GET',
 			url : '/api/my_battles',
@@ -28,6 +28,7 @@ window.onload = function() {
 
 function initPage() {
 	var mainContent = document.getElementById('mainContent');
+	mainContent.innerHTML = "<h1>My Battles</h1>";
 	var createBattleButton = document.createElement('p');
 	createBattleButton.innerHTML = 'Begin a New Battle';
 	createBattleButton.setAttribute('id', 'createBattle');
@@ -36,12 +37,14 @@ function initPage() {
 	mainContent.appendChild(createBattleButton);
 	mainContent.appendChild(battleForm);
 	document.getElementById('createBattle').style.cursor="pointer";
+	document.getElementById('createBattle').addEventListener("click", showCreateBattleForm, false);
 }
 
 function displayBattles(response) {
 	if (response == 'not logged in') {
 		document.getElementById('mainContent').innerHTML = "You are not logged in!";
 	}
+	mybattles = response;
 	response = eval('(' + response + ')');
 	var mainContent = document.getElementById('mainContent');
 	var newTable = document.createElement("table");
@@ -62,9 +65,19 @@ function displayBattles(response) {
 function showCreateBattleForm(event) {
 	var battleForm = document.getElementById('createBattleForm');
 	battleForm.innerHTML = "<p>Battle with: <input type='text' id='oppName' /><input type='button' value='Start battle' id='startBattle' /></p>";
-	battleForm.innerHTML += "<p><input type='button' value='Find an online player' name='findOnline' /></p>";
+	battleForm.innerHTML += "<p><input type='button' value='Find an online player' name='findOnline' id='findOnline'/></p>";
 	document.getElementById('createBattle').setAttribute('hidden', 'true');
 	document.getElementById('startBattle').addEventListener('click', createBattle, false);
+	document.getElementById('findOnline').addEventListener('click', findPlayer, false);
+}
+
+function findPlayer() {
+	$.ajax({
+			type : 'POST',
+			url : '/api/find_battle',
+	});
+	initPage();
+	displayBattles(mybattles);
 }
 
 function createBattle(event) {
@@ -83,8 +96,7 @@ function showBattle(response) {
 		alert('The opponent name you entered is invalid');
 	}
 	else {
-		sessionStorage['battleid'] = response;
-		window.location.href = '/battle.html';
+		window.location.href = '/mybattles.html';
 	}
 }
 

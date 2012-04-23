@@ -15,7 +15,7 @@ def get_battles()
 	end
 	query = "(SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id=#{playerid} and p2id=userid) "
 	query += "UNION "
-	query += "(SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id=userid and p2id=#{playerid});"
+	query += "(SELECT battleid, name AS playerid, startdate, status FROM battles, users WHERE p1id=userid and p2id=#{playerid}) ORDER BY startdate DESC;"
 	conn = DBTools.new.connectToDB()
 	result = conn.exec(query)
 	response = Array.new
@@ -27,18 +27,18 @@ def get_battles()
 end
 
 def create_battle(opponentName)
-	#if (DBTools.new.getPlayerId(session['sessionid']) == false)
-	#	return 'not logged in'
-	#else
-	#	playerid = DBTools.new.getPlayerId(session['sessionid']);
-	#end
-	playerid = 1	
+	if (DBTools.new.getPlayerId(session['sessionid']) == false)
+		return 'not logged in'
+	else
+		playerid = DBTools.new.getPlayerId(session['sessionid']);
+	end
 	
 	begin
 		conn = DBTools.new.connectToDB()
-		opponentName = conn.escape(opponentName)
-		query = "INSERT INTO battles VALUES (default, #{playerid}, (SELECT userid FROM users WHERE name='#{opponentName}'), default, default, default, default);"
-		conn.exec(query)
+		opponentName = conn.escape_string(opponentName);
+		query = "INSERT INTO battles VALUES (default, #{playerid}, (SELECT userid FROM users WHERE name='#{opponentName}' AND userid<>#{playerid}), default, default, default, default);"
+		result = conn.exec(query)
+		File.open('battle.log', 'w') {|f| f.write(result.to_json) }
 	rescue
 		conn.finish()
 		return 'invalid'
