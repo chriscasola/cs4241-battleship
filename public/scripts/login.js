@@ -1,7 +1,5 @@
 /**
- * TODO This comment.
- * 
- * TODO Work on the overlay some more. Need to be able to close it after login. Need to fix formatting.
+ * This allows the user to login.
  * 
  * @author Chris Page
  */
