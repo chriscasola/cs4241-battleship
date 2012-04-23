@@ -20,6 +20,7 @@ require 'api/RegisterApi'
 require 'api/LeaderboardApi'
 require 'api/game_play'
 require 'api/battles'
+require 'api/battleMatcher'
 require 'json'
 
 set :static, true
@@ -62,6 +63,14 @@ end
 
 post '/api/create_battle' do
 	create_battle(request.body.read)
+end
+
+post '/api/find_battle' do
+	find_battle()
+end
+
+get '/api/find_match' do
+	find_match()
 end
 
 get '/db_manager' do
