@@ -157,6 +157,10 @@ nav li a:link, nav li a:visited {
 	color: rgb(22,41,67);
 }
 
+.newBattle {
+	background-color: red;
+}
+
 #mainContent tr:hover {
 	color: rgb(22,41,67);
 	background: -o-linear-gradient(top, rgba(209,209,209, 0.75) 27%, rgba(173,173,173, 0.75) 64%);

@@ -7,6 +7,7 @@
  */
 
 var mybattles = {};
+var newBattle = false;
 
 window.onload = function() {	
 	if (sessionStorage['playerid'] == undefined) {
@@ -60,6 +61,9 @@ function displayBattles(response) {
 	for (i=0; i<response.length; i++) {
 		var newRow = document.createElement("tr");
 		newRow.innerHTML = "<td>" + response[i].playerid + "</td><td>" + convertDateTime(response[i]) + "</td><td>" + response[i].status + "</td>";
+		if (newBattle && (i==0)) {
+			newRow.setAttribute('class', 'newBattle');
+		}
 		newTable.appendChild(newRow);
 		newRow.addEventListener("click", onClickBattleRow, false);
 		newRow.setAttribute("battleid", response[i].battleid);
@@ -105,6 +109,7 @@ function checkForBattles(response) {
 			else {
 				alert('We found you a match!');
 			}
+			newBattle = true;
 		}
 		initPage();
 		getBattles();
