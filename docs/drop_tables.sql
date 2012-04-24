@@ -8,6 +8,8 @@ DROP TABLE battle_positions;
 
 DROP TABLE battles;
 
+DROP TABLE users_notify;
+
 DROP TABLE users_icons;
 
 DROP TABLE users_online;
