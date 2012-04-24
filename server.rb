@@ -71,8 +71,8 @@ post '/api/find_battle' do
 	find_battle()
 end
 
-get '/api/find_match' do
-	find_match()
+get '/api/update_matches' do
+	update_matches()
 end
 
 get '/db_manager' do

@@ -121,3 +121,12 @@ CREATE TABLE battle_moves (
 	time timestamp DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT pk_moves PRIMARY KEY (battleid, playerid, xpos, ypos)
 );
+
+/**
+ * Keep track of users who need to be notified of new battles
+ */
+CREATE TABLE users_notify (
+	userid integer PRIMARY KEY REFERENCES users(userid),
+	battleid integer NOT NULL REFERENCES battles(battleid),
+	invite boolean DEFAULT false
+);

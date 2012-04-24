@@ -17,13 +17,18 @@ window.onload = function() {
 	} 
 	else {
 		initPage();
-		$.ajax({
-			type : 'GET',
-			url : '/api/my_battles',
-			success : displayBattles,
-			error : myBattlesReqFail,
-		});
+		getBattles();
+		waitForOpponent();
 	}
+}
+
+function getBattles() {
+	$.ajax({
+		type : 'GET',
+		url : '/api/my_battles',
+		success : displayBattles,
+		error : myBattlesReqFail,
+	});
 }
 
 function initPage() {
@@ -48,6 +53,7 @@ function displayBattles(response) {
 	response = eval('(' + response + ')');
 	var mainContent = document.getElementById('mainContent');
 	var newTable = document.createElement("table");
+	newTable.setAttribute('id', 'battleTable');
 	newTable.innerHTML = "<thead><tr><th>Opponent</th><th>Start Date</th><th>Status</th></tr></thead>";
 	
 	var i;
@@ -73,11 +79,37 @@ function showCreateBattleForm(event) {
 
 function findPlayer() {
 	$.ajax({
-			type : 'POST',
-			url : '/api/find_battle',
+		type : 'POST',
+		url : '/api/find_battle',
 	});
 	initPage();
 	displayBattles(mybattles);
+}
+
+function waitForOpponent() {
+	$.ajax({
+		type : 'GET',
+		url : '/api/update_matches',
+		success: checkForBattles
+	});
+}
+
+function checkForBattles(response) {
+	response = eval('(' + response + ')');
+	var battleTable = document.getElementById('battleTable');
+	if (response.length > 0) {
+		for (var i = 0; i < response.length; i++) {
+			if (response[i].invite == 't') {
+				alert('You have been invited to a battle!');
+			}
+			else {
+				alert('We found you a match!');
+			}
+		}
+		initPage();
+		getBattles();
+	}
+	setTimeout(waitForOpponent, 5000);
 }
 
 function createBattle(event) {

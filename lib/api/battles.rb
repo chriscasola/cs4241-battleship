@@ -36,9 +36,12 @@ def create_battle(opponentName)
 	begin
 		conn = DBTools.new.connectToDB()
 		opponentName = conn.escape_string(opponentName);
-		query = "INSERT INTO battles VALUES (default, #{playerid}, (SELECT userid FROM users WHERE name='#{opponentName}' AND userid<>#{playerid}), default, default, default, default);"
-		result = conn.exec(query)
-		File.open('battle.log', 'w') {|f| f.write(result.to_json) }
+		conn.transaction do
+			query = "INSERT INTO battles VALUES (default, #{playerid}, (SELECT userid FROM users WHERE name='#{opponentName}' AND userid<>#{playerid}), default, default, default, default);"
+			conn.exec(query)
+			query = "INSERT INTO users_notify VALUES ((SELECT userid FROM users WHERE name='#{opponentName}' LIMIT 1), (SELECT battleid FROM battles ORDER BY battleid DESC LIMIT 1), true);"
+			conn.exec(query)
+		end
 	rescue
 		conn.finish()
 		return 'invalid'
