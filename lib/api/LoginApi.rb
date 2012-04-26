@@ -2,7 +2,7 @@
   This file contains the LoginApi class.
   
   @author Chris Page
-  @version 4/14/2012
+  @version 4/25/2012
 =end
 
 require 'sinatra/base'
@@ -62,16 +62,16 @@ class LoginApi < Sinatra::Base
                 session["sessionid"] = sessionid
 
                 # return JSON
-                return generateLoginJSON(true, {:name => name, :userid => userid, :sessionid => sessionid})
+                return generateJSON_Login(true, {:name => name, :userid => userid, :sessionid => sessionid})
         	
         	# If an exception is thrown
-        	rescue Exception => e
-        		return generateLoginJSON(false, {:error => e.message})
+        	rescue Exception => ex
+        		return generateJSON_Login(false, {:error => ex.message})
         	end
 
         # If the email or password is invalid.
         else
-        	return generateLoginJSON(false, {:error => "Email or password is invalid."})
+        	return generateJSON_Login(false, {:error => "Email or password is invalid."})
         end
     end
     
@@ -87,7 +87,7 @@ class LoginApi < Sinatra::Base
     # => 						describing why login was unsuccessful.
     #
     # @return	The JSON response to send to the client.
-    def generateLoginJSON(success, hash)
+    def generateJSON_Login(success, hash)
     	if (success)
     		return JSON.generate({'success' => true, 'name' => hash[:name], 'userid' => hash[:userid], 'sessionid' => hash[:sessionid]})
     	else
@@ -103,7 +103,7 @@ class LoginApi < Sinatra::Base
     # @raise	If there isn't exactly one updated row.
     def insertNewUsersOnlineRecord(sessionid, userid)
     	
-    	# SQL statement for inserting a new record into the user's online table
+    	# SQL statement for inserting a new record into the users_online table
     	query = "INSERT INTO users_online (sessionid, userid)
 				VALUES ('%%sessionid%%', %%userid%%);"
 		
