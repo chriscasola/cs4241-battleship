@@ -342,7 +342,7 @@ class GamePlayApi < Sinatra::Base
 	    	conn.finish()
 	        raise
 	    end
-	
+		the_shot['hit'] = false
 	    result.each do |row|
 	        if ((row['orientation'] == 'horizontal') && # deals with checking horizontally placed ships
 	            (row['ypos'].to_i == the_shot['ypos'].to_i) && # check if the y positions match
