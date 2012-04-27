@@ -64,7 +64,7 @@ function getShips() {
 function receiveShips(response) {
 	response = eval('(' + response + ')');
 	if (response.success == "false") {
-		document.getElementById('mainContent').innerHTML = response.message;
+		alert(response.message);
 	}
 	else {
 		ship_list = response.message;
@@ -122,21 +122,35 @@ function receiveShots(shot_list) {
 }
 
 /*
- * This functions gets the position of the mouse click
+ * This functions gets the position of the mouse click on the canvas
  */
 function getClickPosition(event, canvas) {
-	if(event.x != undefined && event.y != undefined) {
-		x = event.x;
-		y = event.y;
-	} else {/* code to work with Firefox */
-		x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-		y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-	}
-	x -= canvas.offsetLeft;
-	y -= canvas.offsetTop;
-	var clickPos = {
-		x : x,
-		y : y
-	};
-	return clickPos;
+	return canvas.relMouseCoords(event);
 }
+
+/*
+ * Helper function to compute the mouse click position relative
+ * to the canvas.
+ * 
+ * THIS CODE COURTESY OF: Ryan Artecona
+ * FROM: http://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
+ */
+function relMouseCoords(event){
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = this;
+
+    do{
+        totalOffsetX += currentElement.offsetLeft;
+        totalOffsetY += currentElement.offsetTop;
+    }
+    while(currentElement = currentElement.offsetParent)
+
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+
+    return {x:canvasX, y:canvasY}
+}
+HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
