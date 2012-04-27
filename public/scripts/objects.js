@@ -120,27 +120,16 @@ Ship.prototype.mouseToCell = function () {
 }
 
 /*
- * Function to send a Shot to the server
+ * Send the ship to the server
  */
 Ship.prototype.send = function () {
 	$.ajax({
 	  type: 'POST',
 	  url: '/api/ship',
 	  data: JSON.stringify(this),
-	  success: receiveShip,
+	  success: receiveShips,
 	  dataType: 'text'
 	});
-}
-
-function receiveShip(response) {
-	if (response == 'invalid') {
-		alert('Invalid ship');
-	}
-	else {
-		var ship_obj = eval('(' + response + ')');
-		var the_ship = new Ship(ship_obj.battleid, ship_obj.playerid, ship_obj.xpos, ship_obj.ypos, ship_obj.stype, ship_obj.orientation, ship_obj.afloat);
-		the_ship.draw(leftCanvas);
-	}
 }
 
 /*
@@ -235,26 +224,20 @@ Shot.prototype.send = function () {
 	});
 }
 
+/*
+ * Receive a shot from the server
+ */
 function receiveShot(response) {
-	if (response == 'invalid') {
-		alert('Invalid shot');
-	}
-	else if (response == 'ships_missing') {
-		alert('The other player has not placed all their ships yet');
-	}
-	else if (response == 'not your turn') {
-		alert('It is not your turn');
+	var response = eval('(' + response + ')');
+	if (response.success == 'false' && response.message.length > 0) {
+		alert(response.message);
 	}
 	else {
-		var shot_obj = eval('(' + response + ')');
+		var shot_obj = response.content;
 		var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit, shot_obj.id);
 		the_shot.draw(rightCanvas);
-		if (shot_obj.sunk == true) {
-			alert ('Congratulations! You sunk their ship.');
-		}
-		if (shot_obj.win == true) {
-			alert ('Congratulations! You won the game.');
-			// TODO something to move both players away from the game page
+		if (response.message.length > 0) {
+			alert(response.message);
 		}
 	}
 }

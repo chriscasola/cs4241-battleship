@@ -46,26 +46,28 @@ function canvasClick(event) {
 	thisShot.send();
 }
 
+/*
+ * Retrieve all of the users's ships that are in the current battle
+ */
 function getShips() {
 	$.ajax({
-		type : 'POST',
-		url : '/api/get_ships',
-		data : JSON.stringify({
-			battleid : sessionStorage['battleid'],
-			playerid : sessionStorage['playerid']
-		}),
+		type : 'GET',
+		url : '/api/ship?request=' + JSON.stringify({battleid : sessionStorage['battleid'], playerid : sessionStorage['playerid']}),
 		success : receiveShips,
 		dataType : 'text'
 	});
 }
 
+/*
+ * Display each of the retrieved ships on the game board
+ */
 function receiveShips(response) {
-	if (response == 'not logged in') {
-		document.getElementById('mainContent').innerHTML = "You are not logged in!";
+	response = eval('(' + response + ')');
+	if (response.success == "false") {
+		document.getElementById('mainContent').innerHTML = response.message;
 	}
-	else if(response != 'none') {
-		ship_list = eval('(' + response + ')');
-
+	else {
+		ship_list = response.message;
 		var i;
 		for( i = 0; i < ship_list.length; i++) {
 			var ship_obj = ship_list[i];
@@ -91,30 +93,22 @@ function listenForUpdates() {
 }
 
 function receiveUpdate(response) {
-	if (response == 'not logged in') {
-		document.getElementById('mainContent').innerHTML = "You are not logged in!";
-		return;
+	response = eval('(' + response + ')');
+	if (response.success == "false") {
+		document.getElementById('mainContent').innerHTML = response.message;
 	}
-	resp_obj = eval('(' + response + ')');
-
-	switch (resp_obj.type) {
-		case 'info':
-			// do nothing
-			break;
-
-		case 'shot':
-			receiveOtherShot(resp_obj.content);
-			if (resp_obj.content[0].message == 'lost') {
-				alert("You lost the game!");
-			}
-			break;
+	else {
+		if (response.message.length > 0) {
+			alert(response.message);
+		}
+		receiveShots(response.content);
 	}
 	setTimeout(listenForUpdates, 5000);
 }
 
-function receiveOtherShot(shot_list) {
+function receiveShots(shot_list) {
 	var i;
-	for( i = 1; i < shot_list.length; i++) {
+	for (i = 0; i < shot_list.length; i++) {
 		var shot_obj = shot_list[i];
 		var the_shot = new Shot(parseInt(shot_obj.battleid), parseInt(shot_obj.playerid), parseInt(shot_obj.xpos), parseInt(shot_obj.ypos), shot_obj.hit, parseInt(shot_obj.id));
 		the_shot.hit = (the_shot.hit == 't') ? true : false;

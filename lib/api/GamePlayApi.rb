@@ -15,93 +15,110 @@ require 'json'
 class GamePlayApi < Sinatra::Base
 	
 	enable :sessions
-	
-	@@SQL_InsertBattleMove =
-<<EOS
-INSERT INTO battle_moves(battleid, playerid, xpos, ypos, hit)
-VALUES (%%battleid%%, %%playerid%%, %%xpos%%, %%ypos%%, %%hit%%);
-EOS
-	
+
+	# Static values for the length of each ship type
 	@@Ship_lengths = {'carrier' => 5, 'battleship' => 4, 'submarine' => 3, 'cruiser' => 3, 'destroyer' => 2}
 	
+	#########################################################
+	# Web server routes handled by this class
+	#########################################################
+	
+	# Receives a new shot from the user
 	post '/api/shot' do
     	receive_shot(request.body.read)
 	end
 	
+	# Send to the user any shot they do not already have
 	post '/api/check_shot' do
 	    send_shots(request.body.read)
 	end
 	
+	# Receives a new ship from the user
 	post '/api/ship' do
 	    receive_ship(request.body.read)
 	end
 	
-	post '/api/get_ships' do
-	    send_ships(request.body.read)
+	# Sends the user all their ships in the current battle
+	get '/api/ship' do
+	    send_ships(params[:request])
 	end
 	
+	#########################################################
+	# Receives a ship from the user 
+	#
+	# Handles: POST /api/ship
+	#########################################################
 	def receive_ship(json_req)
 	    the_ship = JSON.parse(json_req)
 	    
-	    if (DBTools.new.getPlayerId(session['sessionid']) == false)
-	    	return 'not logged in'
+	    # Get the user's playerid and make sure they are logged in
+	    playerid = DBTools.new.getPlayerId(session['sessionid'])
+	    if (playerid == false)
+	    	return sendErrorResponse('The player is not logged in')
 	    else
-	    	the_ship['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
+	    	the_ship['playerid'] = playerid
 	    end
 	
+		# Check that the ship placement is within the bounds of the game board
 	    if (check_bounds(the_ship) == false)
-	        return 'invalid'
+	    	return sendErrorResponse('This ship placement would be outside the bounds of the game board.')
 	    end
 	    
+	    # Check that the ship doesn't overlap any other ships
 	    if (check_overlap(the_ship) == false)
-	    	return 'invalid'
+	    	return sendErrorResponse('This ship placement overlaps another ship.')
 	    end
-	    
-	    sql_InsertShip = 
-<<EOS
-INSERT INTO battle_positions
-VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['stype']}', '#{the_ship['orientation']}', '#{the_ship['afloat']}', 0)
-EOS
 	    
 	    begin
-	    #store the ship in db
-	        conn = DBTools.new.connectToDB
-	        conn.exec(sql_InsertShip)
-	        conn.finish()
+	    	# store the ship in db
+	    	DBTools.new.insertShip(the_ship)
+	    	
+	    	# return the ship upon success
+	    	return sendResponse([the_ship])
 	    rescue
-	        conn.finish()
-	        return 'invalid'
+	    	# the ship has already been placed
+	    	return sendErrorResponse('You have already placed a ship of this type.')
 	    end
-	    return the_ship.to_json
 	end
 	
+	##############################################################
+	# Check if the given ship overlaps other already placed ships
+	#
+	# Returns true if there is no overlap, otherwise false
+	##############################################################
 	def check_overlap(the_ship)
-		query = "SELECT xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']};"
-		conn = DBTools.new.connectToDB
-		result = conn.exec(query)
+		
+		# Get all of the user's ships
+		result = DBTools.new.getAllUsersShipsInBattle(the_ship['battleid'], the_ship['playerid'])
 		
 		# Check if there are any ships, if not no need to check overlap
 		if (result.ntuples() == 0)
 			return true
 		end
 		
+		# Get the start and end coordinates of the new ship
 		ship_loc = get_ship_coordinates(the_ship)
 		
-		# check each existing ship for overlap
+		# check each existing ship for overlap with the new ship
 		result.each do |row|
+			# get the coordinates of the current ship
 			row_loc = get_ship_coordinates(row)
+			
+			# check for overlap when the existing ship is vertical and the new ship is horizontal
 			if ((row['orientation'] == 'vertical') && (the_ship['orientation'] == 'horizontal'))
 				if ((ship_loc[:beg_y] <= row_loc[:end_y]) && (ship_loc[:beg_y] >= row_loc[:beg_y]))
 					if ((row_loc[:beg_x] <= ship_loc[:end_x]) && (row_loc[:beg_x] >= ship_loc[:beg_x]))
 						return false
 					end
 				end
+			# check for overlap when the existing ship is horizontal and the new ship is vertical
 			elsif ((row['orientation'] == 'horizontal') && (the_ship['orientation'] == 'vertical'))
 				if ((row_loc[:beg_y] <= ship_loc[:end_y]) && (row_loc[:beg_y] >= ship_loc[:beg_y]))
 					if ((ship_loc[:beg_x] <= row_loc[:end_x]) && (ship_loc[:beg_x] >= row_loc[:beg_x]))
 						return false
 					end
 				end
+			# check for overlap when both ships are horizontal
 			elsif ((row['orientation'] == 'horizontal') && (the_ship['orientation'] == 'horizontal'))
 				if (ship_loc[:beg_y] == row_loc[:beg_y])
 					if (((ship_loc[:beg_x] <= row_loc[:end_x]) && (ship_loc[:beg_x] >= row_loc[:beg_x])) || \
@@ -109,6 +126,7 @@ EOS
 						return false
 					end
 				end
+			# check for overlap when both ships are vertical
 			elsif ((row['orientation'] == 'vertical') && (the_ship['orientation'] == 'vertical'))
 				if (ship_loc[:beg_x] == row_loc[:beg_x])
 					if (((ship_loc[:beg_y] <= row_loc[:end_y]) && (ship_loc[:beg_y] >= row_loc[:beg_y])) || \
@@ -118,11 +136,16 @@ EOS
 				end
 			end
 		end
+		
+		# there is no overlap
 		return true
 	end
 	
+	##############################################################
+	# Return the start and end coordinates of the ship in a hash
+	# with the following keys: :beg_x, :beg_y, :end_x, :end_y
+	##############################################################
 	def get_ship_coordinates(the_ship)
-		# get the start and end coordinates of the_ship
 		ship_beg_x = 0
 		ship_beg_y = 0
 		ship_end_x = 0
@@ -139,6 +162,12 @@ EOS
 		return {:beg_x => ship_beg_x, :beg_y => ship_beg_y, :end_x => ship_end_x, :end_y => ship_end_y}
 	end
 	
+	##############################################################
+	# Check if the given ship would be within the bounds of
+	# the game board.
+	#
+	# Returns true if valid, otherwise false
+	##############################################################
 	def check_bounds(the_ship)
 	    if (the_ship['orientation'] == 'vertical')
 	        if ((the_ship['xpos'] > 9) || (the_ship['xpos'] < 0))
@@ -160,97 +189,118 @@ EOS
 	    return true
 	end
 	
+	##############################################################
+	# Sends all of the player's ships in the current battle
+	#
+	# Handles: GET /api/ship
+	##############################################################
 	def send_ships(request)
 	    state = JSON.parse(request)
 	    
-	    if (DBTools.new.getPlayerId(session['sessionid']) == false)
-	    	return 'not logged in'
-	    else
-	    	state['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
+	    # Make sure the player is logged in
+	    playerid = DBTools.new.getPlayerId(session['sessionid'])
+	    if (playerid == false)
+	    	return sendErrorResponse('The player is not logged in')
 	    end
 	    
 	    battleid = state['battleid']
-	    playerid = state['playerid']
-	    query = "SELECT * FROM battle_positions WHERE battleid=#{battleid} AND playerid=#{playerid};"
-	    conn = DBTools.new.connectToDB
+
 	    begin
-	        result = conn.exec(query)
+	    	# Get all the user's ships from the database
+	        result = DBTools.new.getAllUsersShipsInBattle(battleid, playerid)
+	        if (result.ntuples() > 0)
+		        # Put each ship in the response array
+		        response = Array.new
+		        result.each do |row|
+		            response << row
+		        end
+		        # Send the ships in the response
+		        return sendResponse(response)
+			else
+				# There are no ships to send
+				return sendResponse([])
+	    	end 
 	    rescue
-	        conn.finish()
-	        return 'error'
+	    	# An error occurred either due to an invalid request or issues with the database
+	    	return sendErrorResponse('Could not retrieve your ships!')
 	    end
-	    if (result.ntuples() > 0)
-	        response = Array.new
-	        result.each do |row|
-	            response << {'battleid' => row['battleid'], 'playerid' => row['playerid'], 'xpos' => row['xpos'], 'ypos' => row['ypos'], 'stype' => row['stype'], 'orientation' => row['orientation'], 'afloat' => row['afloat']}
-	        end
-	        conn.finish()
-	        return response.to_json
-	    else
-	        response = 'none'
-	        conn.finish()
-	        return response
-	    end 
 	end
 	
+	##############################################################
+	# Receives a new shot from the player
+	#
+	# Handles: POST /api/shot
+	##############################################################
 	def receive_shot(json_req)
 	    the_shot = JSON.parse(json_req)
 	    
-	    if (DBTools.new.getPlayerId(session['sessionid']) == false)
-	    	return 'not logged in'
+	    # Check if the user is logged in
+	    playerid = DBTools.new.getPlayerId(session['sessionid'])
+	    if (playerid == false)
+	    	return sendErrorResponse('The player is not logged in')
 	    else
 	    	the_shot['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
 	    end
 	    
+	    # Check that the shot has a valid position
 	    if (verify_shot(the_shot) == false)
-	        return 'invalid'
+	    	return sendErrorResponse('')
 	    end
 	    
+	    # Check to make sure it is the player's turn
 	    if (is_my_turn(the_shot) == false)
-	    	return 'not your turn'
+	    	return sendErrorResponse('It is not your turn!')
 	    end
 	 
 	    begin
+	    	# Determine if this shot is a hit
 	        is_hit!(the_shot)
 	    rescue
-	        return 'ships_missing'
+	    	# Catch the error thrown when all of the opponents ships have not yet been placed
+	        return sendErrorResponse('Your opponent has not placed all their ships yet!')
 	    end
 	    
 	    begin
-	    #store the shot in db
-	        conn = DBTools.new.connectToDB
-	        query = @@SQL_InsertBattleMove.gsub(/%%battleid%%/, the_shot["battleid"])
-	        query = query.gsub(/%%playerid%%/, the_shot["playerid"])
-	        query = query.gsub(/%%xpos%%/, the_shot["xpos"].to_s)
-	        query = query.gsub(/%%ypos%%/, the_shot["ypos"].to_s)
-	        query = query.gsub(/%%hit%%/, the_shot["hit"].to_s)
-	        conn.exec(query)
+	    	# Store the shot in the database
+	    	DBTools.new.insertBattleMove(the_shot["battleid"], the_shot["playerid"], the_shot["xpos"].to_s, the_shot["ypos"].to_s, the_shot["hit"].to_s)
 	    rescue
-	        conn.finish()
-	        return 'invalid'
+	        return sendErrorResponse('')
 	    end
 	    
-	    check_win!(conn, the_shot)
+	    # Check if the current player won
+	    message = ""
+	    if (check_my_win(the_shot) == true)
+	    	message = "Congratulations. You won!"
+	    end
 	    
-	    conn.finish()
-	    return the_shot.to_json
+	    # Return the message and shot
+	    return {'success' => 'true', 'message' => message, 'content' => the_shot}.to_json
 	end
 	
-	def check_win!(conn, the_shot)
-		query = "SELECT stype FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']} AND afloat=false;"
-		result = conn.exec(query)
+	##############################################################
+	# Check if the current player won the game
+	##############################################################
+	def check_my_win(the_shot)
+		result = DBTools.new.getAllOpponentsSunkShipsInBattle(the_shot['battleid'], the_shot['playerid'])
 		if (result.ntuples() == 5)
-			the_shot['win'] = true
-			update_battle_status(the_shot['playerid'], the_shot['battleid'], conn)
+			File.open('battle.log', 'w') {|f| f.write('a player won') }
+			end_battle(the_shot['playerid'], the_shot['battleid'])
+			return true
 		end
+		return false
 	end
 	
-	def update_battle_status(playerid, battleid, conn)
+	##############################################################
+	# Mark the given battle as over and store the winner
+	##############################################################
+	def end_battle(playerid, battleid)
 		status = 'p' + playerid + 'win';
-		query = "UPDATE battles SET status='#{status}' WHERE battleid=#{battleid}; "
-		query += "UPDATE battles SET enddate=now() WHERE battleid=#{battleid};"
-		conn.exec(query)
+		DBTools.new.markBattleOver(battleid, status)
 	end
+	
+	# TODO test that the above function, end_battle works correctly with
+	# the new DBTools call.  Then proceed to rework this file with the
+	# next function.
 	
 	def is_my_turn(the_shot)
 		# Find out whose turn it is
@@ -312,7 +362,6 @@ EOS
 	        end
 	    end
 	    conn.finish()
-	    the_shot['sunk'] = is_sunk
 	end
 	
 	def increment_hits(the_ship, conn)
@@ -332,14 +381,14 @@ EOS
 	    state = JSON.parse(request)
 	    
 	    if (DBTools.new.getPlayerId(session['sessionid']) == false)
-	    	return 'not logged in'
+	    	return sendErrorResponse('You are not logged in!')
 	    else
 	    	state['playerid'] = DBTools.new.getPlayerId(session['sessionid'])
 	    end
 	    
 	    query =
 <<EOS
-SELECT moveid, battleid, playerid, xpos, ypos, hit
+SELECT moveid AS id, battleid, playerid, xpos, ypos, hit
 FROM battle_moves
 WHERE moveid>#{state['last_shot']}
 AND battleid=#{state['battleid']};
@@ -350,21 +399,21 @@ EOS
 	        result = conn.exec(query)
 	    rescue
 	        conn.finish()
-	        return 'error'
+	        return sendErrorResponse('A server error occurred in the send_ships method.')
 	    end
 	    if (result.ntuples() > 0)
 	        response = Array.new
-	        response << {'message' => ''}
+	        message = ""
 	        result.each do |row|
-	            response << {'battleid' => row['battleid'], 'playerid' => row['playerid'], 'xpos' => row['xpos'], 'ypos' => row['ypos'], 'hit' => row['hit'], 'id' => row['moveid']}
+	            response << row
 	        end
 	        if (check_win(conn, state['battleid'], state['playerid']))
-	        	response[0]['message'] = 'lost'
+	        	message = 'You lost the game!'
 	        end
 	    	conn.finish()
-	    	return {'type' => 'shot', 'content' => response}.to_json
+	    	return {'success' => 'true', 'message' => message, 'content' => response}.to_json
 	    else
-	        response = {'type' => 'info', 'message' => 'none'}.to_json
+	        response = {'success' => 'true', 'message' => '', 'content' => []}.to_json
 	    	conn.finish()
 	    	return response
 	    end
@@ -386,4 +435,12 @@ EOS
 	    end
 	    return true
 	end
+end
+
+def sendResponse(message)
+	return {'success' => 'true', 'message' => message}.to_json
+end
+
+def sendErrorResponse(message)
+	return {'success' => 'false', 'message' => message}.to_json
 end

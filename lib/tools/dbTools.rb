@@ -21,19 +21,72 @@ class DBTools
     	conn = PG::Connection.new( :host => $3, :dbname => $1, :user => $4, :password => $2)
 	end
 	
+	# Execute a SQL query
+	#
+	# @param String the query to execute
+	#
+	def executeQuery(queryString)
+		conn = connectToDB()
+		result = conn.exec(queryString)
+		conn.finish()
+		return result
+	end
+	
+	################################################
+	# Below are functions that act as wrappers for
+	# various SQL queries.  All of these functions
+	# return the result of the query they contain
+	################################################
 	
 	# Get the playerid associated with this session
 	def getPlayerId(sessionid)
 		begin
 			query = "SELECT userid FROM users_online WHERE sessionid='#{sessionid}';"
-			conn = connectToDB()
-			result = conn.exec(query)
+			result = executeQuery(query)
 			retVal = result[0]['userid']
-			conn.finish()
 			return retVal
 		rescue
-			conn.finish()
 			return false
 		end
+	end
+	
+	# Insert the given ship into the database
+	def insertShip(the_ship)
+		sql_InsertShip = "INSERT INTO battle_positions
+						 VALUES (#{the_ship['battleid']}, #{the_ship['playerid']}, 
+						 #{the_ship['xpos']}, #{the_ship['ypos']}, '#{the_ship['stype']}',
+						 '#{the_ship['orientation']}', '#{the_ship['afloat']}', 0)"
+		executeQuery(sql_InsertShip)
+	end
+	
+	# Get all of the ships associated with the given player and battle
+	def getAllUsersShipsInBattle(battleid, playerid)
+		query = "SELECT *
+				 FROM battle_positions
+				 WHERE battleid=#{battleid} AND playerid=#{playerid};"
+		executeQuery(query)
+	end
+	
+	# Get all the ships that are sunk, belong to the player with the given
+	# id, and in the given battle 
+	def getAllOpponentsSunkShipsInBattle(battleid, playerid)
+		query = "SELECT *
+				 FROM battle_positions
+				 WHERE battleid=#{battleid} AND playerid<>#{playerid} AND afloat=false;"
+		executeQuery(query)
+	end
+	
+	# Insert a new battle move
+	def insertBattleMove(battleid, playerid, xpos, ypos, hit)
+		query = "INSERT INTO battle_moves(battleid, playerid, xpos, ypos, hit)
+				 VALUES (#{battleid}, #{playerid}, #{xpos}, #{ypos}, #{hit});"
+		executeQuery(query)
+	end
+	
+	# Mark a battle as over and store the given status
+	def markBattleOver(battleid, status)
+		query = "UPDATE battles SET status='#{status}' WHERE battleid=#{battleid};
+				 UPDATE battles SET enddate=now() WHERE battleid=#{battleid};"
+		executeQuery(query)
 	end
 end

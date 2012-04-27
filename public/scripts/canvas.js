@@ -24,7 +24,7 @@ window.onload = function () {
 	getShips();
 	
 	// Listen for updates from server
-	listenForUpdates();
+	setTimeout(listenForUpdates, 200);
 	
 	// Listen for ship placement
 	leftCanvas.addEventListener("mouseup", placeShip, false);
