@@ -26,7 +26,7 @@ class DBTools
 	# @param String the query to execute
 	#
 	def executeQuery(queryString)
-		conn = connectToDB()
+		conn = connectToDB
 		result = conn.exec(queryString)
 		conn.finish()
 		return result
