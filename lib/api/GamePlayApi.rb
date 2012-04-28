@@ -283,7 +283,7 @@ class GamePlayApi < Sinatra::Base
 	def check_my_win(the_shot)
 		result = DBTools.new.getAllOpponentsSunkShipsInBattle(the_shot['battleid'], the_shot['playerid'])
 		if (result.ntuples() == 5)
-			File.open('battle.log', 'w') {|f| f.write('a player won') }
+			#File.open('battle.log', 'w') {|f| f.write('a player won') }
 			end_battle(the_shot['playerid'], the_shot['battleid'])
 			return true
 		end
@@ -343,24 +343,32 @@ class GamePlayApi < Sinatra::Base
 	        raise
 	    end
 		the_shot['hit'] = false
+		#File.open('battle.log', 'a') {|f| f.write("***************************\n") }
+		#File.open('battle.log', 'a') {|f| f.write("The shot: " + the_shot.to_json + "\n") }
 	    result.each do |row|
+	    	#File.open('battle.log', 'a') {|f| f.write("Current row: " + row.to_json + "\n") }
 	        if ((row['orientation'] == 'horizontal') && # deals with checking horizontally placed ships
 	            (row['ypos'].to_i == the_shot['ypos'].to_i) && # check if the y positions match
 	            (the_shot['xpos'].to_i < row['xpos'].to_i + @@Ship_lengths[row['stype']]) && # check if the x position is within the ship
 	            (the_shot['xpos'].to_i >= row['xpos'].to_i))
+	            #File.open('battle.log', 'a') {|f| f.write("Found match with horizontal ship\n") }
 	            is_sunk = increment_hits(row, conn)
 				the_shot['hit'] = true
+				#File.open('battle.log', 'a') {|f| f.write("The shot: " + the_shot.to_json + "\n") }
 	            break
-	        else # deal with vertically placed ships
+	        elsif ((row['orientation'] == 'vertical'))# deal with vertically placed ships
 	            if ((row['xpos'].to_i == the_shot['xpos'].to_i) && # check if x positions match
 					(the_shot['ypos'].to_i < row['ypos'].to_i + @@Ship_lengths[row['stype']]) && # check if the y position is within the ship
 					(the_shot['ypos'].to_i >= row['ypos'].to_i))
+					#File.open('battle.log', 'a') {|f| f.write("Found match with vertical ship\n") }
 		            is_sunk = increment_hits(row, conn)
 		            the_shot['hit'] = true
+		            #File.open('battle.log', 'a') {|f| f.write("The shot: " + the_shot.to_json + "\n") }
 		            break
 	            end
 	        end
 	    end
+	    #File.open('battle.log', 'a') {|f| f.write("***************************\n") }
 	    conn.finish()
 	end
 	
