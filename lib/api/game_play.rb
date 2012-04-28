@@ -4,6 +4,7 @@
 # Author: Chris Casola, Chris Page
 #
 
+require 'api/dbmgr'
 require 'tools/dbTools'
 require 'json'
 
@@ -40,7 +41,7 @@ EOS
     
     begin
     #store the ship in db
-        conn = DBTools.new.connectToDB()
+        conn = connectToDB(ENV['SHARED_DATABASE_URL'])
         conn.exec(sql_InsertShip)
         conn.finish()
     rescue
@@ -52,7 +53,7 @@ end
 
 def check_overlap(the_ship)
 	query = "SELECT xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']};"
-	conn = DBTools.new.connectToDB()
+	conn = connectToDB(ENV['SHARED_DATABASE_URL'])
 	result = conn.exec(query)
 	
 	# Check if there are any ships, if not no need to check overlap
@@ -147,7 +148,7 @@ def send_ships(request)
     battleid = state['battleid']
     playerid = state['playerid']
     query = "SELECT * FROM battle_positions WHERE battleid=#{battleid} AND playerid=#{playerid};"
-    conn = DBTools.new.connectToDB()
+    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
     begin
         result = conn.exec(query)
     rescue
@@ -193,7 +194,7 @@ def receive_shot(json_req)
     
     begin
     #store the shot in db
-        conn = DBTools.new.connectToDB()
+        conn = connectToDB(ENV['SHARED_DATABASE_URL'])
         query = SQL_InsertBattleMove.gsub(/%%battleid%%/, the_shot["battleid"])
         query = query.gsub(/%%playerid%%/, the_shot["playerid"])
         query = query.gsub(/%%xpos%%/, the_shot["xpos"].to_s)
@@ -230,7 +231,7 @@ end
 def is_my_turn(the_shot)
 	# Find out whose turn it is
 	query = "SELECT p1id, p2id, status FROM battles WHERE battleid=#{the_shot['battleid']};"
-	conn = DBTools.new.connectToDB()
+	conn = connectToDB(ENV['SHARED_DATABASE_URL'])
 	result = conn.exec(query)
 	my_turn = false
 	if ((result[0]['status'] == 'p1turn') && (result[0]['p1id'].to_i == the_shot['playerid'].to_i))
@@ -258,7 +259,7 @@ def is_my_turn(the_shot)
 end
 
 def is_hit!(the_shot)
-    conn = DBTools.new.connectToDB()
+    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
 	is_sunk = false
     # Get all the opponent's ships
     query = "SELECT battleid, playerid, xpos, ypos, stype, orientation FROM battle_positions WHERE battleid=#{the_shot['battleid']} AND playerid<>#{the_shot['playerid']};"
@@ -320,7 +321,7 @@ WHERE moveid>#{state['last_shot']}
 AND battleid=#{state['battleid']};
 EOS
 
-    conn = DBTools.new.connectToDB()
+    conn = connectToDB(ENV['SHARED_DATABASE_URL'])
     begin
         result = conn.exec(query)
     rescue
