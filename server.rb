@@ -18,9 +18,9 @@ require 'sinatra'
 require 'api/LoginApi'
 require 'api/RegisterApi'
 require 'api/LeaderboardApi'
-require 'api/GamePlayApi'
+#require 'api/GamePlayApi'
 require 'api/DBShell'
-#require 'api/game_play'
+require 'api/game_play'
 require 'api/battles'
 require 'api/battleMatcher'
 require 'json'
@@ -31,7 +31,7 @@ set :public, File.dirname(__FILE__) + '/public'
 use LoginApi
 use RegisterApi
 use LeaderboardApi
-use GamePlayApi
+#use GamePlayApi
 use DBShell
 
 get '/' do
@@ -45,21 +45,21 @@ get '/test' do
     'success!'
 end
 
-#post '/api/shot' do
-#    receive_shot(request.body.read)
-#end
+post '/api/shot' do
+    receive_shot(request.body.read)
+end
 
-#post '/api/check_shot' do
-#    send_shots(request.body.read)
-#end
+post '/api/check_shot' do
+    send_shots(request.body.read)
+end
 
-#post '/api/ship' do
-#    receive_ship(request.body.read)
-#end
+post '/api/ship' do
+    receive_ship(request.body.read)
+end
 
-#post '/api/get_ships' do
-#    send_ships(request.body.read)
-#end
+post '/api/get_ships' do
+    send_ships(request.body.read)
+end
 
 get '/api/my_battles' do
 	get_battles()
