@@ -80,18 +80,17 @@ function fillTopMenuRightSide() {
  * Adds the username and a logout link to the right side of the menu.
  */
 function fillTopMenuRightSideUserStuff() {
-	// TODO This function.
 	var elMenuBarList = document.getElementById("menuBarList");
 	
 	var elUsernameLi = document.createElement("li");
-	var elUsernameLiP = document.createElement("p");
+	var elUsernameLiA = document.createElement("a");
 	var elLogoutLi = document.createElement("li");
 	var elLogoutLiA = document.createElement("a");
 	
-	elUsernameLiP.setAttribute('id', 'userNameLabel');
-	elUsernameLiP.innerHTML = sessionStorage['playername'];
+	elUsernameLiA.setAttribute('href', '/userconfig.html');
+	elUsernameLiA.innerHTML = "<p id='userNameLabel'>" + sessionStorage['playername'] + "</p>";
 	
-	elUsernameLi.appendChild(elUsernameLiP);
+	elUsernameLi.appendChild(elUsernameLiA);
 	elUsernameLi.setAttribute("id", "menuUsername");
 	elUsernameLi.setAttribute("class", "rightSide");
 	

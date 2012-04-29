@@ -5,11 +5,18 @@
   @version 4/25/2012
 =end
 
-# TODO This comment
+require 'sinatra/base'
+require 'json'
+require 'tools/inputValidator'
+require 'tools/dbTools'
+
+# This class handles dealing with users server-side. It is intended to 
+# eventually replace LoginApi and RegisterApi.
 class UserModule < Sinatra::Base
 	
 	# Enable sessions
 	enable :sessions
+
 	
 	get '/user/basicinfo' do
 		basicInfo(params[:userid])
@@ -37,7 +44,10 @@ class UserModule < Sinatra::Base
 	
 	# Handle path for post request to update user information
 	post '/user/update' do
-		update()
+		update(params[:cPassword], params[:nPassword1], params[:nPassword2], params[:nEmail1], params[:nEmail2], params[:nName], params[:nIconId])
+	end
+	get '/user/update' do
+		update(params[:cPassword], params[:nPassword1], params[:nPassword2], params[:nEmail1], params[:nEmail2], params[:nName], params[:nIconId])
 	end
 	
 	
@@ -85,7 +95,7 @@ class UserModule < Sinatra::Base
 	def update(cPassword, nPassword1, nPassword2, nEmail1, nEmail2, nName, nIconid)
 		
 		# Get the sessionid from the session
-		session = session["sessionid"]
+		session = session['sessionid']
 		
 		begin
 			# Get the userid given the sessionid
@@ -119,6 +129,8 @@ class UserModule < Sinatra::Base
         		if (nIconid != nil)
         			db_update_user_icon(userid, nIconid)
         		end
+        		
+        		return generateJSON_Update(true, '')
         		
         	# If password is invalid
         	else
@@ -463,7 +475,11 @@ class UserModule < Sinatra::Base
     end
 	
 	# TODO This comment
-	def generateJSON_Update(name, nameError, iconid, iconidError)
-    	# TODO This function
+	def generateJSON_Update(success, error)
+		if (success)
+    		return JSON.generate({'success' => success})
+    	else
+    		return JSON.generate({'success' => success, 'error' => error})
+    	end
     end
 end

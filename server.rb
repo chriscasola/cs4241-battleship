@@ -20,6 +20,7 @@ require 'api/RegisterApi'
 require 'api/LeaderboardApi'
 require 'api/GamePlayApi'
 require 'api/DBShell'
+require 'api/UserModule'
 #require 'api/game_play'
 require 'api/battles'
 require 'api/battleMatcher'
@@ -33,6 +34,7 @@ use RegisterApi
 use LeaderboardApi
 use GamePlayApi
 use DBShell
+use UserModule
 
 get '/' do
     redirect 'http://' + request.host_with_port() + '/index.html'
