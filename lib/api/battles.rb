@@ -51,7 +51,7 @@ def create_battle(opponentName)
 end
 
 def processBattlesRow(playerid, row, response)
-	sdate = /\A(\d\d\d\d)-(\d\d)-(\d\d)\s*(\d*):(\d*)/.match(row['startdate'])
+	sdate = /\A([\d*]*)-0*(\d*)-0*(\d*)\s*0*(\d*):(\d*)/.match(row['startdate'])
 	status = /\A\S(\S)(\S*)/.match(row['status'])
 	if (status[1] == playerid)
 		if (status[2] == 'win')

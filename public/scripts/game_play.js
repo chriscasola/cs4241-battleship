@@ -4,6 +4,7 @@
  */
 
 var last_shot_received = 0;
+var my_turn = false;
 
 function placeShip(event) {
 	var clickPos = getClickPosition(event, event.target);
@@ -98,6 +99,16 @@ function receiveUpdate(response) {
 		document.getElementById('mainContent').innerHTML = response.message;
 	}
 	else {
+		if (response.turn != my_turn) {
+			if (response.turn == true) {
+				alert("It is your turn!");
+				my_turn = true;
+			}
+			else if (response.turn == false) {
+				alert("It is not your turn!");
+				my_turn = false;
+			}
+		}
 		if (response.message.length > 0) {
 			alert(response.message);
 		}

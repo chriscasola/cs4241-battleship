@@ -143,6 +143,20 @@ nav li a:link, nav li a:visited {
 	width: 55%;
 }
 
+#alert {
+	opacity: 0;
+	padding: 5px 5px 5px 5px;
+	border: 3px solid #2a549f;
+	background-color: #96aceb;
+	color: black;
+	border-radius: 10px;
+	width: 30%;
+	margin-left: auto;
+	margin-right: auto;
+	
+	-webkit-transition: opacity .5s ease-in-out;
+}
+
 
 #mainContent table, th, td {
 	border: 1px solid rgb(173,173,173);;

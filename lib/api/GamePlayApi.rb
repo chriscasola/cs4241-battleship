@@ -302,7 +302,7 @@ class GamePlayApi < Sinatra::Base
 	# the new DBTools call.  Then proceed to rework this file with the
 	# next function.
 	
-	def is_my_turn(the_shot)
+	def is_my_turn(the_shot, change = true)
 		# Find out whose turn it is
 		query = "SELECT p1id, p2id, status FROM battles WHERE battleid=#{the_shot['battleid']};"
 		conn = DBTools.new.connectToDB
@@ -312,18 +312,20 @@ class GamePlayApi < Sinatra::Base
 			# It is my turn
 			my_turn = true
 			
-			# Change battle status in database
-			query = "UPDATE battles SET status='p2turn' WHERE battleid=#{the_shot['battleid']};"
-			conn.exec(query)
-			
+			if (change == true)
+				# Change battle status in database
+				query = "UPDATE battles SET status='p2turn' WHERE battleid=#{the_shot['battleid']};"
+				conn.exec(query)
+			end
 		elsif ((result[0]['status'] == 'p2turn') && (result[0]['p2id'].to_i == the_shot['playerid'].to_i))
 			# It is my turn
 			my_turn = true
 			
-			# Change battle status in database
-			query = "UPDATE battles SET status='p1turn' WHERE battleid=#{the_shot['battleid']};"
-			conn.exec(query)
-			
+			if (change == true)
+				# Change battle status in database
+				query = "UPDATE battles SET status='p1turn' WHERE battleid=#{the_shot['battleid']};"
+				conn.exec(query)
+			end
 		else
 			# It is not my turn
 			my_turn = false
@@ -405,6 +407,7 @@ EOS
 	    conn = DBTools.new.connectToDB
 	    begin
 	        result = conn.exec(query)
+	        my_turn = is_my_turn({'battleid' => state['battleid'], 'playerid' => state['playerid']})
 	    rescue
 	        conn.finish()
 	        return sendErrorResponse('A server error occurred in the send_ships method.')
@@ -419,9 +422,9 @@ EOS
 	        	message = 'You lost the game!'
 	        end
 	    	conn.finish()
-	    	return {'success' => 'true', 'message' => message, 'content' => response}.to_json
+	    	return {'success' => 'true', 'message' => message, 'content' => response, 'turn' => my_turn}.to_json
 	    else
-	        response = {'success' => 'true', 'message' => '', 'content' => []}.to_json
+	        response = {'success' => 'true', 'message' => '', 'content' => [], 'turn' => my_turn}.to_json
 	    	conn.finish()
 	    	return response
 	    end
