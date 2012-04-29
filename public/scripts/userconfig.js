@@ -23,14 +23,14 @@ function UserConfig () {
 		var elNIconId = document.getElementById("nIconId");
 		var elUserConfigSubmit = document.getElementById("UserConfigSubmit");
 		
-		elCPassword.setAttribute("disabled", "disabled");
-		elNPassword1.setAttribute("disabled", "disabled");
-		elNPassword2.setAttribute("disabled", "disabled");
-		elNEmail1.setAttribute("disabled", "disabled");
-		elNEmail2.setAttribute("disabled", "disabled");
-		elNName.setAttribute("disabled", "disabled");
-		elNIconId.setAttribute("disabled", "disabled");
-		elUserConfigSubmit.setAttribute("disabled", "disabled");
+		elCPassword.setAttribute("disabled", "true");
+		elNPassword1.setAttribute("disabled", "true");
+		elNPassword2.setAttribute("disabled", "true");
+		elNEmail1.setAttribute("disabled", "true");
+		elNEmail2.setAttribute("disabled", "true");
+		elNName.setAttribute("disabled", "true");
+		elNIconId.setAttribute("disabled", "true");
+		elUserConfigSubmit.setAttribute("disabled", "true");
 	}
 	
 	/**
@@ -106,10 +106,8 @@ function UserConfig () {
 			regenerateTopMenu();
 		}
 		else {
-			document.getElementById('loginError').innerHTML="<p>Information update failed! Error recieved: " + result.error + "</p>";
-			enableLoginInput();
+			document.getElementById('errorUserConfig').innerHTML="<p>Information update failed! Error recieved: " + result.error + "</p>";
 		}
-		
 		this.enableUserConfigInput();
 	}
 }
