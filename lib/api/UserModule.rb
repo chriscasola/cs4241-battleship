@@ -95,38 +95,38 @@ class UserModule < Sinatra::Base
 	def update(cPassword, nPassword1, nPassword2, nEmail1, nEmail2, nName, nIconid)
 		
 		# Get the sessionid from the session
-		session = session['sessionid']
+		sessionid = session['sessionid']
 		
 		begin
 			# Get the userid given the sessionid
 			userid = db_select_user_userid(sessionid)
 		
 			# If the password is valid and the password is correct
-        	if (validatePassword(password) && db_verify_user_password(userid, password))
+        	if (validatePassword(cPassword) && db_verify_user_password(userid, cPassword))
         		
         		# Change password
-        		if (nPassword1 != nil)
+        		if (nPassword1 != "")
         			if (validatePassword(nPassword1) && nPassword1 == nPassword2)
         				db_update_user_password(userid, nPassword1)
         			end
         		end
         		
         		# Change email
-        		if (nEmail1 != nil)
+        		if (nEmail1 != "")
         			if (validateEmail(nEmail1) && nEmail1 == nEmail2)
         				db_update_user_email(userid, nEmail1)
         			end
         		end
         		
         		# Change name
-        		if (nName != nil)
+        		if (nName != "")
         			if (validateName(nName))
         				db_update_user_name(userid, nName)
         			end
         		end
         		
         		# Change picture
-        		if (nIconid != nil)
+        		if (nIconid != "")
         			db_update_user_icon(userid, nIconid)
         		end
         		
@@ -134,7 +134,7 @@ class UserModule < Sinatra::Base
         		
         	# If password is invalid
         	else
-        		return generateJSON_Update(false, {:error => "Invalid password."})
+        		return generateJSON_Update(false, {:error => "Invalid password. " + cPassword + "|" + nPassword1})
         	end
         	
         # If an exception is thrown
@@ -281,13 +281,13 @@ class UserModule < Sinatra::Base
 		results = conn.exec(query)
 		
 		# If there are 0 results
-        if (results.ntuples == 0)
+        if (results.cmd_tuples() == 0)
         	results.clear()
             conn.finish()
             raise "Email not updated."
 
         # If there are too many results (this should never occur)
-        elsif (results.ntuples > 1)
+        elsif (results.cmd_tuples() > 1)
         	results.clear()
         	conn.finish()
             raise "Too many emails changed. Database now corrupt."
@@ -322,13 +322,13 @@ class UserModule < Sinatra::Base
 		results = conn.exec(query)
 		
 		# If there are 0 results
-        if (results.ntuples == 0)
+        if (results.cmd_tuples() == 0)
         	results.clear()
             conn.finish()
             raise "Icon not updated."
 
         # If there are too many results (this should never occur)
-        elsif (results.ntuples > 1)
+        elsif (results.cmd_tuples() > 1)
         	results.clear()
         	conn.finish()
             raise "Too many icons changed. Database now corrupt."
@@ -365,13 +365,13 @@ class UserModule < Sinatra::Base
 		results = conn.exec(query)
 		
 		# If there are 0 results
-        if (results.ntuples == 0)
+        if (results.cmd_tuples() == 0)
         	results.clear()
             conn.finish()
             raise "Name not updated."
 
         # If there are too many results (this should never occur)
-        elsif (results.ntuples > 1)
+        elsif (results.cmd_tuples() > 1)
         	results.clear()
         	conn.finish()
             raise "Too many names changed. Database now corrupt."
@@ -408,13 +408,13 @@ class UserModule < Sinatra::Base
 		results = conn.exec(query)
 		
 		# If there are 0 results
-        if (results.ntuples == 0)
+        if (results.cmd_tuples() == 0)
         	results.clear()
             conn.finish()
             raise "Password not updated."
 
         # If there are too many results (this should never occur)
-        elsif (results.ntuples > 1)
+        elsif (results.cmd_tuples() > 1)
         	results.clear()
         	conn.finish()
             raise "Too many passwords changed. Database now corrupt."
@@ -479,7 +479,7 @@ class UserModule < Sinatra::Base
 		if (success)
     		return JSON.generate({'success' => success})
     	else
-    		return JSON.generate({'success' => success, 'error' => error})
+    		return JSON.generate({'success' => success, 'error' => error[:error]})
     	end
     end
 end
