@@ -104,10 +104,10 @@ function checkForBattles(response) {
 	if (response.length > 0) {
 		for (var i = 0; i < response.length; i++) {
 			if (response[i].invite == 't') {
-				alert('You have been invited to a battle!');
+				window.newAlert('You have been invited to a battle!');
 			}
 			else {
-				alert('We found you a match!');
+				window.newAlert('We found you a match!');
 			}
 			newBattle = true;
 		}
@@ -130,7 +130,7 @@ function createBattle(event) {
 
 function showBattle(response) {
 	if (response == 'invalid') {
-		alert('The opponent name you entered is invalid');
+		newAlert('The opponent name you entered is invalid');
 	}
 	else {
 		window.location.href = '/mybattles.html';

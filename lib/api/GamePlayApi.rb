@@ -407,7 +407,7 @@ EOS
 	    conn = DBTools.new.connectToDB
 	    begin
 	        result = conn.exec(query)
-	        my_turn = is_my_turn({'battleid' => state['battleid'], 'playerid' => state['playerid']})
+	        my_turn = is_my_turn({'battleid' => state['battleid'], 'playerid' => state['playerid']}, false)
 	    rescue
 	        conn.finish()
 	        return sendErrorResponse('A server error occurred in the send_ships method.')

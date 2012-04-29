@@ -4,7 +4,7 @@
  */
 
 var last_shot_received = 0;
-var my_turn = null;
+var my_turn = "null";
 
 function placeShip(event) {
 	var clickPos = getClickPosition(event, event.target);
@@ -65,7 +65,7 @@ function getShips() {
 function receiveShips(response) {
 	response = eval('(' + response + ')');
 	if (response.success == "false") {
-		alert(response.message);
+		newAlert(response.message);
 	}
 	else {
 		ship_list = response.message;
@@ -101,16 +101,15 @@ function receiveUpdate(response) {
 	else {
 		if (response.turn != my_turn) {
 			if (response.turn == true) {
-				alert("It is your turn!");
+				newAlert("It is your turn!");
 				my_turn = true;
 			}
 			else if (response.turn == false) {
-				alert("It is not your turn!");
 				my_turn = false;
 			}
 		}
 		if (response.message.length > 0) {
-			alert(response.message);
+			newAlert(response.message);
 		}
 		receiveShots(response.content);
 	}

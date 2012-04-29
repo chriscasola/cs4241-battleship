@@ -230,14 +230,14 @@ Shot.prototype.send = function () {
 function receiveShot(response) {
 	var response = eval('(' + response + ')');
 	if (response.success == 'false' && response.message.length > 0) {
-		alert(response.message);
+		newAlert(response.message);
 	}
 	else {
 		var shot_obj = response.content;
 		var the_shot = new Shot(shot_obj.battleid, shot_obj.playerid, shot_obj.xpos, shot_obj.ypos, shot_obj.hit, shot_obj.id);
 		the_shot.draw(rightCanvas);
 		if (response.message.length > 0) {
-			alert(response.message);
+			newAlert(response.message);
 		}
 	}
 }
