@@ -4,7 +4,7 @@
  */
 
 var last_shot_received = 0;
-var my_turn = false;
+var my_turn = null;
 
 function placeShip(event) {
 	var clickPos = getClickPosition(event, event.target);
