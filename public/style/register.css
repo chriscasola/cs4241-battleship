@@ -1,3 +1,9 @@
+/*
+ * Style for the register user page
+ * 
+ * Author: Chris Page
+ */
+
 #registerBox {
 	background: linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
 	background: -o-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);

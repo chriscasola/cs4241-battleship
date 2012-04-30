@@ -12,6 +12,7 @@
   src: local('Londrina Sketch'), local('LondrinaSketch-Regular'), url('http://themes.googleusercontent.com/static/fonts/londrinasketch/v1/p7Ai06aT1Ycp_D2fyE3z6z0WCr4BXWfANofoahM5yqc.woff') format('woff');
 }
 
+/* Style for the entire page */
 body {
 	margin: 0;
 	padding: 0;
@@ -122,6 +123,7 @@ nav li a:link, nav li a:visited {
 	font-family: 'Arial', 'Sans Serif';
 }
 
+/* The instructions section on the home page */
 #instructions {
 	background-color: #838da9;
 	padding: 1.5em;
@@ -141,6 +143,7 @@ nav li a:link, nav li a:visited {
 	font-style: italic;
 }
 
+/* The create battle button */
 #createBattle {
 	font-size: 1em;
 	border: 2px solid rgb(173, 173, 173);
@@ -154,31 +157,13 @@ nav li a:link, nav li a:visited {
 	background-color: rgba(173, 173, 173, .25);
 }
 
-
+/* Style for any tables thath appear in main content sections */
 #mainContent table {
 	border-collapse: collapse;
 	margin-left: auto;
 	margin-right: auto;
 	width: 55%;
 }
-
-#alert {
-	opacity: 0;
-	padding: 5px 5px 5px 5px;
-	border: 3px solid #2a549f;
-	background-color: #96aceb;
-	color: black;
-	border-radius: 10px;
-	width: 30%;
-	margin-left: auto;
-	margin-right: auto;
-	
-	-webkit-transition: opacity .5s ease-in-out;
-	-moz-transition: opacity .5s ease-in-out;
-	-o-transition: opacity .5s ease-in-out;
-	transition: opacity .5s ease-in-out;
-}
-
 
 #mainContent table, th, td {
 	border: 1px solid rgb(173,173,173);;
@@ -193,10 +178,12 @@ nav li a:link, nav li a:visited {
 	color: rgb(22,41,67);
 }
 
+/* Style newly added battles in the My Battles Table differently */
 .newBattle {
 	background-color: red;
 }
 
+/* Show a gradient background for the table row the user is mousing over */
 #mainContent tr:hover {
 	color: rgb(22,41,67);
 	background: -o-linear-gradient(top, rgba(209,209,209, 0.75) 27%, rgba(173,173,173, 0.75) 64%);
@@ -206,6 +193,26 @@ nav li a:link, nav li a:visited {
 	background: linear-gradient(top, rgba(209,209,209, 0.75) 27%, rgba(173,173,173, 0.75) 64%);
 }
 
+/* Style for alert popups */
+#alert {
+	opacity: 0;
+	padding: 5px 5px 5px 5px;
+	border: 3px solid #2a549f;
+	background-color: #96aceb;
+	color: black;
+	border-radius: 10px;
+	width: 30%;
+	margin-left: auto;
+	margin-right: auto;
+	
+	/* Enable fade in fade out transition */
+	-webkit-transition: opacity .5s ease-in-out;
+	-moz-transition: opacity .5s ease-in-out;
+	-o-transition: opacity .5s ease-in-out;
+	transition: opacity .5s ease-in-out;
+}
+
+/* Style for the ship type select input */
 #orientationSelection {
 	margin-top: 25px;
 	margin-bottom: 10px;

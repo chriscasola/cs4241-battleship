@@ -1,3 +1,9 @@
+/*
+ * Style for the login pop up
+ * 
+ * Author: Chris Page
+ */
+
 #loginBox {
 	background: linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);
 	background: -o-linear-gradient(top, rgb(209,209,209) 27%, rgb(173,173,173) 64%);

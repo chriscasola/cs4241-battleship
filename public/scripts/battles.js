@@ -1,5 +1,5 @@
 /*
- * File to display battles a user is involved with
+ * File to display battles a user is involved with on the "My Battles" page
  *
  * Author: Chris Casola
  * Author: Chris Page
@@ -10,19 +10,22 @@ var mybattles = {};
 var newBattle = false;
 
 window.onload = function() {	
-	if (sessionStorage['playerid'] == undefined) {
+	if (sessionStorage['playerid'] == undefined) { /* the user is not logged in, alert them */
 		var mainContent = document.getElementById('mainContent');
 		var newElement = document.createElement("p");
 		newElement.innerHTML = "You need to login to see your battles.";
 		mainContent.appendChild(newElement);
 	} 
 	else {
-		initPage();
-		getBattles();
-		waitForOpponent();
+		initPage(); /* add the create battle section to the page */
+		getBattles(); /* retrieve the user's battles from the server */
+		waitForOpponent(); /* start polling to listen for new battles */
 	}
 }
 
+/*
+ * Make a request for the user's battles
+ */
 function getBattles() {
 	$.ajax({
 		type : 'GET',
@@ -32,6 +35,9 @@ function getBattles() {
 	});
 }
 
+/*
+ * Add the basic UI items to the page
+ */
 function initPage() {
 	var mainContent = document.getElementById('mainContent');
 	mainContent.innerHTML = "<h1>My Battles</h1>";
@@ -46,6 +52,9 @@ function initPage() {
 	document.getElementById('createBattle').addEventListener("click", showCreateBattleForm, false);
 }
 
+/*
+ * Add each battle to the My Battles table
+ */
 function displayBattles(response) {
 	if (response == 'not logged in') {
 		document.getElementById('mainContent').innerHTML = "You are not logged in!";
@@ -72,6 +81,9 @@ function displayBattles(response) {
 	mainContent.appendChild(newTable);
 }
 
+/*
+ * Cause the CreateBattleForm to appear when the user clicks "Begin a new Battle"
+ */
 function showCreateBattleForm(event) {
 	var battleForm = document.getElementById('createBattleForm');
 	battleForm.innerHTML = "<p>Battle with: <input type='text' id='oppName' /><input type='button' value='Start battle' id='startBattle' /></p>";
@@ -81,6 +93,9 @@ function showCreateBattleForm(event) {
 	document.getElementById('findOnline').addEventListener('click', findPlayer, false);
 }
 
+/*
+ * Request a match be found for the player
+ */
 function findPlayer() {
 	$.ajax({
 		type : 'POST',
@@ -90,6 +105,9 @@ function findPlayer() {
 	displayBattles(mybattles);
 }
 
+/*
+ * Poll for any new battles the player is invited to
+ */
 function waitForOpponent() {
 	$.ajax({
 		type : 'GET',
@@ -98,6 +116,10 @@ function waitForOpponent() {
 	});
 }
 
+/*
+ * React to responses from the server that may or may not
+ * indicate a new battle has been created
+ */
 function checkForBattles(response) {
 	response = eval('(' + response + ')');
 	var battleTable = document.getElementById('battleTable');
@@ -117,6 +139,9 @@ function checkForBattles(response) {
 	setTimeout(waitForOpponent, 5000);
 }
 
+/*
+ * Creates a new battle with the player id input by the user
+ */
 function createBattle(event) {
 	var opponentName = document.getElementById('oppName').value;
 	$.ajax({
@@ -128,6 +153,7 @@ function createBattle(event) {
 	});
 }
 
+
 function showBattle(response) {
 	if (response == 'invalid') {
 		newAlert('The opponent name you entered is invalid');
@@ -137,8 +163,12 @@ function showBattle(response) {
 	}
 }
 
+/*
+ * Moves to the battle page when the user clicks on a battle
+ */
 function onClickBattleRow(event) {
 	sessionStorage['battleid'] = event.currentTarget.getAttribute('battleid');
+	sessionStorage['opponentName'] = event.currentTarget.children[0].innerHTML;
 	window.location.href = '/battle.html';
 }
 

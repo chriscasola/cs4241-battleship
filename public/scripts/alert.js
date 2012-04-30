@@ -6,7 +6,7 @@
  */
 
 /*
- * Function to override the default alert function
+ * Create a new globally available alert function
  */
 (function() {
 	window.newAlert = function(message) {

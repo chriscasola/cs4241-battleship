@@ -9,6 +9,9 @@ var leftCanvas;
 var rightCanvas;
 
 window.onload = function () {
+	// Set the title for the page
+	document.title = "Battle Ship - " + sessionStorage['playername'] + " vs. " + sessionStorage['opponentName'];
+	
 	// Find the canvas elements
 	leftCanvas = document.getElementById('opponentBoard');
 	rightCanvas = document.getElementById('myBoard');
