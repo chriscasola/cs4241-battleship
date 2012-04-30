@@ -134,7 +134,7 @@ class UserModule < Sinatra::Base
         		
         	# If password is invalid
         	else
-        		return generateJSON_Update(false, {:error => "Invalid password. " + cPassword + "|" + nPassword1})
+        		return generateJSON_Update(false, {:error => "Invalid password."})
         	end
         	
         # If an exception is thrown
