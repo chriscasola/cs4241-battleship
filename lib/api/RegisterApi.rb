@@ -45,7 +45,7 @@ EOS
 	end
 	
 	# Attempts to register a new user with the given information.
-    #
+    # TODO This function needs to also insert a record into the users_icons table.
     # @param [String] email The user's email address.
     # @param [String] password1  The user's password.
     # @param [String] password2  The user's password (confirmation).
