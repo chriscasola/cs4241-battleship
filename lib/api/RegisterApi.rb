@@ -2,7 +2,7 @@
   This file contains the RegisterApi class.
   
   @author Chris Page
-  @version 4/14/2012
+  @version 4/30/2012
 =end
 
 require 'sinatra/base'
