@@ -19,6 +19,8 @@ class DBTools
 	def connectToDB(dbPath=ENV['SHARED_DATABASE_URL'])
     	dbPath =~ %r|^postgres://(\S*):(\S*)@(\S*)/(\S*)$|
     	conn = PG::Connection.new( :host => $3, :dbname => $1, :user => $4, :password => $2)
+    	conn.exec("SET SESSION TIME ZONE 'America/New_York';")
+    	return conn
 	end
 	
 	# Execute a SQL query
