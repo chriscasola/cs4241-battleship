@@ -298,10 +298,11 @@ class GamePlayApi < Sinatra::Base
 		DBTools.new.markBattleOver(battleid, status)
 	end
 	
-	# TODO test that the above function, end_battle works correctly with
-	# the new DBTools call.  Then proceed to rework this file with the
-	# next function.
-	
+
+	##############################################################
+	# Determine if it is this player's turn, and if change is set
+	# to true, update the database to flip the turn status
+	##############################################################
 	def is_my_turn(the_shot, change = true)
 		# Find out whose turn it is
 		query = "SELECT p1id, p2id, status FROM battles WHERE battleid=#{the_shot['battleid']};"
@@ -334,6 +335,9 @@ class GamePlayApi < Sinatra::Base
 		return my_turn
 	end
 	
+	##############################################################
+	# Determine if the given shot is a hit
+	##############################################################
 	def is_hit!(the_shot)
 	    conn = DBTools.new.connectToDB
 		is_sunk = false
@@ -345,35 +349,32 @@ class GamePlayApi < Sinatra::Base
 	        raise
 	    end
 		the_shot['hit'] = false
-		#File.open('battle.log', 'a') {|f| f.write("***************************\n") }
-		#File.open('battle.log', 'a') {|f| f.write("The shot: " + the_shot.to_json + "\n") }
 	    result.each do |row|
-	    	#File.open('battle.log', 'a') {|f| f.write("Current row: " + row.to_json + "\n") }
 	        if ((row['orientation'] == 'horizontal') && # deals with checking horizontally placed ships
 	            (row['ypos'].to_i == the_shot['ypos'].to_i) && # check if the y positions match
 	            (the_shot['xpos'].to_i < row['xpos'].to_i + @@Ship_lengths[row['stype']]) && # check if the x position is within the ship
 	            (the_shot['xpos'].to_i >= row['xpos'].to_i))
-	            #File.open('battle.log', 'a') {|f| f.write("Found match with horizontal ship\n") }
 	            is_sunk = increment_hits(row, conn)
 				the_shot['hit'] = true
-				#File.open('battle.log', 'a') {|f| f.write("The shot: " + the_shot.to_json + "\n") }
 	            break
 	        elsif ((row['orientation'] == 'vertical'))# deal with vertically placed ships
 	            if ((row['xpos'].to_i == the_shot['xpos'].to_i) && # check if x positions match
 					(the_shot['ypos'].to_i < row['ypos'].to_i + @@Ship_lengths[row['stype']]) && # check if the y position is within the ship
 					(the_shot['ypos'].to_i >= row['ypos'].to_i))
-					#File.open('battle.log', 'a') {|f| f.write("Found match with vertical ship\n") }
 		            is_sunk = increment_hits(row, conn)
 		            the_shot['hit'] = true
-		            #File.open('battle.log', 'a') {|f| f.write("The shot: " + the_shot.to_json + "\n") }
 		            break
 	            end
 	        end
 	    end
-	    #File.open('battle.log', 'a') {|f| f.write("***************************\n") }
 	    conn.finish()
 	end
 	
+	##############################################################
+	# Increments the number of hits on the given ship and marks
+	# the ship as sunk if num hits is equal to the length of
+	# the ship.
+	##############################################################
 	def increment_hits(the_ship, conn)
 		query = "UPDATE battle_positions SET numhits=(numhits + 1) WHERE battleid=#{the_ship['battleid']} AND playerid=#{the_ship['playerid']} AND stype='#{the_ship['stype']}';"
 		conn.exec(query)
@@ -387,6 +388,12 @@ class GamePlayApi < Sinatra::Base
 		return false
 	end
 	
+	##############################################################
+	# Sends any shots that occurred after the given moveid (the
+	# moveid is contained in the request).
+	
+	# Handles: POST /api/check_shot
+	##############################################################
 	def send_shots(request)
 	    state = JSON.parse(request)
 	    
@@ -430,6 +437,9 @@ EOS
 	    end
 	end
 	
+	##############################################################
+	# Checks if the player has won the battle
+	##############################################################
 	def check_win(conn, battleid, playerid)
 		query = "SELECT stype FROM battle_positions WHERE battleid=#{battleid} AND playerid=#{playerid} AND afloat=false;"
 		result = conn.exec(query)
@@ -440,6 +450,11 @@ EOS
 		end
 	end
 	
+	##############################################################
+	# Verify that the given shot is valid response. That is make
+	# sure that it is within the bounds of the game board which
+	# has valid X values of 0 - 9 and valid Y values of 0 - 9.
+	##############################################################
 	def verify_shot(the_shot)
 	    if ((the_shot["xpos"] > 9) || (the_shot["xpos"] < 0) || (the_shot["ypos"] > 9) || (the_shot["ypos"] < 0))
 	    	return false
@@ -448,10 +463,16 @@ EOS
 	end
 end
 
+##############################################################
+# Encapsulate the given message in a response object
+##############################################################
 def sendResponse(message)
 	return {'success' => 'true', 'message' => message}.to_json
 end
 
+##############################################################
+# Encapsulate the given error in a response object
+##############################################################
 def sendErrorResponse(message)
 	return {'success' => 'false', 'message' => message}.to_json
 end

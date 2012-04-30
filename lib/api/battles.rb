@@ -7,6 +7,10 @@
 require 'tools/dbTools'
 require 'json'
 
+####################################################
+# Returns the list of battles the given user is
+# participating in.
+####################################################
 def get_battles()
 	if (DBTools.new.getPlayerId(session['sessionid']) == false)
 		return 'not logged in'
@@ -26,6 +30,10 @@ def get_battles()
 	response.to_json
 end
 
+####################################################
+# Creates a new battle between the current user and
+# the opponent with the given name.
+####################################################
 def create_battle(opponentName)
 	if (DBTools.new.getPlayerId(session['sessionid']) == false)
 		return 'not logged in'
@@ -50,6 +58,14 @@ def create_battle(opponentName)
 	return 'success'
 end
 
+#############################################################
+# This function takes each row generated from the
+# query in the get_battles function above and formats
+# it for display in the user's browser. It also determines
+# if the given player won or lost the battle or, if the
+# battle is still in progress, where or not it is their
+# turn.
+#############################################################
 def processBattlesRow(playerid, row, response)
 	sdate = /\A([\d*]*)-0*(\d*)-0*(\d*)\s*0*(\d*):(\d*)/.match(row['startdate'])
 	status = /\A\S(\S)(\S*)/.match(row['status'])
@@ -79,21 +95,5 @@ def processBattlesRow(playerid, row, response)
 			status = row['playerid'] + "'s turn"
 		end
 	end
-	
-=begin
-	if (status[1].to_i == playerid.to_i)
-		if (status[2] == 'win')
-			status = 'You won'
-		else
-			status = 'Your turn'
-		end
-	else
-		if (status[2] == 'win')
-			status = 'You lost'
-		else
-			status = row['playerid'] + "'s turn"
-		end
-	end
-=end
 	response << {'battleid' => row['battleid'], 'playerid' => row['playerid'], 'syear' => sdate[1], 'smonth' => sdate[2], 'sday' => sdate[3], 'shour' => sdate[4], 'smin' => sdate[5], 'status' => status}
 end
