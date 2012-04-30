@@ -2,7 +2,7 @@
   File to provide a postgre sql shell
   
   @author Chris Casola
-  @version 4/23/2012
+  @version 4/30/2012
   
   On 4/23/2012, C. Page converted this to a Sinatra module.
 =end
@@ -11,6 +11,7 @@ require 'pg'
 require 'tools/dbTools'
 
 # This class provides a db shell.
+# Note: This class is a security risk.
 class DBShell < Sinatra::Base
 	
 	# Handle path for db_manager get
@@ -23,7 +24,10 @@ class DBShell < Sinatra::Base
 	    runDBShell(ENV['SHARED_DATABASE_URL'], params)
 	end
 	
-	# TODO Comment this, maybe split into two functions!!!
+	# Run the DBShell for executing sql on the server.
+	# TODO Finish this comment
+	# @param dbPath
+	# @param params
 	def runDBShell (dbPath, params=nil)
     	if (params == nil)
 <<EOS

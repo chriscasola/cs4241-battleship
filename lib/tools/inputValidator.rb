@@ -15,7 +15,6 @@ def validateEmail(email)
     return false
   end
   
-  # TODO Until this function is correctly implemented, it causes a horrendous security vulnerability.
   return true # TODO This is wrong. Finish this function.
 end
 

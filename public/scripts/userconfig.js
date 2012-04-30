@@ -7,7 +7,7 @@
 var myUserConfig = new UserConfig();
 
 /**
- * TODO This comment
+ * This class deals with ajax requests to update the user's information.
  */
 function UserConfig () {
 	/**
