@@ -1,8 +1,9 @@
 =begin
-  TODO This comment
+  This file contains the UserModule class. It is intended to eventually 
+  replace LoginApi and RegisterApi.
   
   @author Chris Page
-  @version 4/25/2012
+  @version 4/30/2012
 =end
 
 require 'sinatra/base'
@@ -10,8 +11,7 @@ require 'json'
 require 'tools/inputValidator'
 require 'tools/dbTools'
 
-# This class handles dealing with users server-side. It is intended to 
-# eventually replace LoginApi and RegisterApi.
+# This class handles dealing with users server-side.
 class UserModule < Sinatra::Base
 	
 	# Enable sessions
@@ -46,12 +46,13 @@ class UserModule < Sinatra::Base
 	post '/user/update' do
 		update(params[:cPassword], params[:nPassword1], params[:nPassword2], params[:nEmail1], params[:nEmail2], params[:nName], params[:nIconId])
 	end
-	get '/user/update' do
-		update(params[:cPassword], params[:nPassword1], params[:nPassword2], params[:nEmail1], params[:nEmail2], params[:nName], params[:nIconId])
-	end
 	
 	
-	# TODO This comment
+	# Retrieves a user's name and icon based on the userid.
+	#
+	# @param userid	The userid of the user.
+	#
+	# @return	A JSON string with the user's iconid and name or the relevant error messages.
 	def basicInfo (userid)
 		name = nil
 		iconid = nil
@@ -469,12 +470,20 @@ class UserModule < Sinatra::Base
         end
 	end
 	
-	# TODO This comment
+	# Generates the JSON for the basicInfo function's return value.
+	#
+	# @param [String]	name			The name of the user.
+	# @param [String]	nameError		The error gotten when an attempt to retrieve the name was made (if there was an error)
+	# @param [String]	iconid			The iconid of the user.
+	# @param [String]	iconidError	The error gotten when an attempt to retrieve the iconid was made (if there was an error)
 	def generateJSON_BasicInfo(name, nameError, iconid, iconidError)
     	return JSON.generate({'name' => name, 'nameError' => nameError, 'iconid' => iconid, 'iconidError' => iconidError})
     end
 	
-	# TODO This comment
+	# Generates the JSON for the update function's return value.
+	#
+	# @param [boolean]	success	Whether or not the update was successful.
+	# @param [String]	error	The error received (if there was an error).
 	def generateJSON_Update(success, error)
 		if (success)
     		return JSON.generate({'success' => success})
