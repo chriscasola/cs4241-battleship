@@ -16,12 +16,12 @@ class DBShell < Sinatra::Base
 	
 	# Handle path for db_manager get
 	get '/db_manager' do
-	    runDBShell(ENV['SHARED_DATABASE_URL'])
+	    runDBShell(ENV['DATABASE_URL'])
 	end
 	
 	# Handle path for db_manager post
 	post '/db_manager' do
-	    runDBShell(ENV['SHARED_DATABASE_URL'], params)
+	    runDBShell(ENV['DATABASE_URL'], params)
 	end
 	
 	# Run the DBShell for executing sql on the server.

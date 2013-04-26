@@ -16,7 +16,7 @@ class DBTools
 	# @param [String, Optional] The path for connecting to the database.
     #
     # @return [Connection] A new PG::Connection object for the specified path.
-	def connectToDB(dbPath=ENV['SHARED_DATABASE_URL'])
+	def connectToDB(dbPath=ENV['DATABASE_URL'])
     	dbPath =~ %r|^postgres://(\S*):(\S*)@(\S*)/(\S*)$|
     	conn = PG::Connection.new( :host => $3, :dbname => $1, :user => $4, :password => $2)
 	end
